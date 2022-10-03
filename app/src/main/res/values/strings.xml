@@ -1,0 +1,126 @@
+<resources>
+
+
+    <string-array name="taluka_list">
+        <item>राहाता</item>
+        <item>संगमनेर</item>
+
+    </string-array>
+    <string-array name="villageList2">
+        <item>आश्वी बु.</item>
+        <item>उंबरी बाळापुर</item>
+        <item>चिंचपुर बु. / खुर्द</item>
+        <item>औरंगपुर</item>
+        <item>सादतपुर</item>
+        <item>निमगावजाळी</item>
+        <item>प्रतापपुर</item>
+        <item>आश्वी खुर्द</item>
+        <item>चणेगाव</item>
+        <item>झरेकाठी</item>
+        <item>दाढ खुर्द</item>
+        <item>शिबलापुर</item>
+        <item>ओझर खुर्द</item>
+        <item>रहीमपुर</item>
+        <item>मनोली</item>
+        <item>कोल्हेवाडी</item>
+        <item>जोर्वे</item>
+        <item>निंबाळे</item>
+        <item>खळी</item>
+        <item>पिंप्री लौकी अजमपुर</item>
+        <item>पानोडी</item>
+        <item>शेडगाव</item>
+        <item>ओझर बु.</item>
+        <item>कनकापुर</item>
+        <item>कनोली</item>
+        <item>हंगेवाडी</item>
+    </string-array>
+    <string-array name="villageList1">
+        <item>लोणी बु.</item>
+        <item>लोणी खुर्द</item>
+        <item>गोगलगाव</item>
+        <item>आडगाव बु.</item>
+        <item>आडगाव खुर्द</item>
+        <item>पिंप्री लोकई</item>
+        <item>पिंप्री निर्मळ</item>
+        <item>कोल्हार बु.</item>
+        <item>भगवतीपुर</item>
+        <item>पाथरे बु.</item>
+        <item>दाढ बु.</item>
+        <item>हणमंतगाव</item>
+        <item>ममदापुर</item>
+        <item>हसनापुर</item>
+        <item>दुर्गापूर</item>
+        <item>तिसगाव</item>
+        <item>चंद्रापुर</item>
+        <item>लोहगाव</item>
+        <item>बाभळेश्वर खुर्द / बु.</item>
+        <item>राजुरी</item>
+        <item>नांदुर बु. / खुर्द</item>
+        <item>रांजणखोल</item>
+        <item>साकुरी</item>
+        <item>निमगाव कोऱ्हाळे</item>
+        <item>कोऱ्हाळे</item>
+        <item>केलवड खुर्द / बु.</item>
+        <item>कनकुरी</item>
+        <item>नांदुर्खी खुर्द</item>
+        <item>वाळकी</item>
+        <item>अस्तगाव</item>
+        <item>मोरवाडी</item>
+        <item>चोळकेवाडी</item>
+        <item>तरकसवाडी</item>
+        <item>रांजणगाव खुर्द</item>
+        <item>नांदुर्खी बु.</item>
+        <item>पिंपळस</item>
+        <item>दहेगांव कोऱ्हाळे</item>
+        <item>खडकेवाके</item>
+        <item>एकरुखे</item>
+        <item>पिंपळवाडी</item>
+        <item>सावळीविहीर बु.</item>
+        <item>सावळीविहीर खुर्द</item>
+        <item>रुई</item>
+        <item>निघोज</item>
+        <item>डोऱ्हाळे</item>
+        <item>शिर्डी</item>
+        <item>राहाता</item>
+
+    </string-array>
+
+    <string name="app_name">Janseva karyalay</string>
+    <string name="forget_pws">Forget Password</string>
+    <string name="default_notification_channel_id">Sarthi</string>
+    <string name="msg_token_fmt">Firebase Token %s</string>
+    <string name="daily_visit">"Daily Visit / रोजची भेट "</string>
+    <string name="complaint_list">"Complaint List / तक्रार यादी"</string>
+    <string name="complaint_details">"Complaint / तक्रार"</string>
+    <string name="office_work">"Office work / कार्यालयीन काम</string>
+    <string name="new_comment">"New Comment / नवीन टिप्पणी"</string>
+    <string name="visit_Detail">"Details of Visit / भेटीचा तपशील"</string>
+    <string name="electric_info">Electricity info/ वीज माहिती</string>
+    <string name="development_info">Development info/ विकास कामांची माहिती</string>
+    <string name="ration_info">Ration shop info/ रेशन दुकानाची माहिती</string>
+    <string name="drinking_water_info">Drinking water info/ पिण्याच्या पाण्याची माहिती</string>
+    <string name="death_person_info">Dead person info/ मृत व्यक्तीची माहिती</string>
+    <string name="water_canal_info">Water canal info / पाटपाणी माहिती</string>
+    <string name="school_info">School info / शाळा माहिती</string>
+    <string name="other_info">Other info / इतर माहिती</string>
+
+    <string name="prathamik_info">प्राथमिक आरोग्य केंद्र माहिती</string>
+    <string name="pashu_info">पशुवैद्यकिय आरोग्य केंद्र माहिती</string>
+    <string name="gov_emp_info">शासकीय कर्मचारी कामकाज माहिती </string>
+    <string name="politics_info">राजकीय माहिती </string>
+    <string name="birthday_info">वाढदिवस माहिती </string>
+    <string name="gat_labh_yojna">व्यतिगत लाभाच्या योजनांचे नविन प्रस्तावांची माहिती</string>
+
+    <string name="add_daily_work">Add Daily Work / दैनंदिन कार्यालयीन काम</string>
+    <string name="submit">Submit</string>
+    <string name="name">Name</string>
+    <string name="subject">Subject</string>
+    <string name="info">Information</string>
+    <string name="survey">Survey</string>
+    <string name="taluka">Distric/जिल्हा</string>
+    <string name="logout_msg">Do you want to logout?</string>
+    <string name="ok">Ok</string>
+    <string name="permission_error">Location permission required to use this application</string>
+
+
+</resources>

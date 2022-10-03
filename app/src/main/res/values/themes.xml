@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.Sarthi" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/statusBar</item>
+        <item name="colorAccent">@color/teal_700</item>
+    </style>
+
+    <style name="DialogWindowTheme" parent="Theme.Material3.Light.Dialog">
+        <item name="colorAccent">@color/teal_700</item>
+    </style>
+
+    <style name="Theme.CustomSplashScreenTheme" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splashColor</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/rvikhe</item>
+        <item name="windowSplashScreenAnimationDuration">300</item>
+        <item name="postSplashScreenTheme">@style/Theme.Sarthi</item>
+    </style>
+</resources>
