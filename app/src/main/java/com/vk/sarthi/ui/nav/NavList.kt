@@ -12,10 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -27,6 +25,7 @@ import com.vk.sarthi.R
 import com.vk.sarthi.ui.screen.*
 import com.vk.sarthi.ui.theme.SarthiTheme
 import com.vk.sarthi.ui.theme.Teal200
+import com.vk.sarthi.utli.com.vk.sarthi.ui.screen.YojnaList
 
 sealed class Screens(val route: String, val icon: ImageVector?) {
     object Login : Screens("login", null)
@@ -42,6 +41,7 @@ sealed class Screens(val route: String, val icon: ImageVector?) {
     object OfficeWork : Screens("OfficeWork", Icons.Outlined.LeaveBagsAtHome)
     object AddDailyWork : Screens("AddDailyWork", null)
     object DailyVisitDetails : Screens("DailyVisitDetails", null)
+    object YojnaList : Screens("YojnaList", null)
 }
 
 @Composable
@@ -85,7 +85,7 @@ fun BottomNavigationBar(navController: NavHostController) {
 
             // label
             label = {
-                Text(text = stringResource(id = R.string.daily_visit).split("/")[1],
+                Text(text = stringResource(id = R.string.daily_visit),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis)
             },
@@ -114,7 +114,7 @@ fun BottomNavigationBar(navController: NavHostController) {
 
             // label
             label = {
-                Text(text = stringResource(id = R.string.office_work).split("/")[1],
+                Text(text = stringResource(id = R.string.office_work),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis)
             },
@@ -141,6 +141,7 @@ fun ShowNavGraph(name: String) {
 
         composable(Screens.ForgetPassword.route) { ForgetPassword(navigator) }
         composable(Screens.ComplaintList.route) { ComplaintListUI(navigator) }
+        composable(Screens.YojnaList.route) { YojnaList(navigator) }
         composable(Screens.ComplaintDetails.route+"/{id}") {
             ComplaintDetails(id = it.arguments?.getString("id")!!,navigator) }
         composable(Screens.AddComment.route+"/{id}/{commentId}") {

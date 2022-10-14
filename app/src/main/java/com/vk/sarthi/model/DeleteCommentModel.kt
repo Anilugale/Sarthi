@@ -16,3 +16,8 @@ data class DeleteDailyVisitModel(
     val visitid: Int,
     val coordinatorid: Int
 )
+
+
+data class VillageReq(
+    val coordinator_id: Int
+)

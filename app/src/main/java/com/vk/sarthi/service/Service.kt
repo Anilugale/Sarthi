@@ -47,8 +47,25 @@ interface Service {
     @POST(Constants.deleteworkcomment)
     suspend fun deleteOfficeWork(@Body deleteCommentModel: DeleteOfficeWorkModel):Response<CreateOfficeWorkResponse>
 
+    @Multipart
     @POST(Constants.createDailyvisit)
-    suspend fun createDailyVisit(@Body model: DailyVisitReqModel):Response<DailyVisitResponse>
+    suspend fun createDailyVisit(
+        @PartMap partMap: Map<String, @JvmSuppressWildcards RequestBody>,
+        @Part birthdayFileBody: MultipartBody.Part?,
+        @Part rashanshopinfoBody: MultipartBody.Part?,
+        @Part electricInfoFileBody: MultipartBody.Part?,
+        @Part drinkingwaterinfofileBody: MultipartBody.Part?,
+        @Part watercanelinfofileBody: MultipartBody.Part?,
+        @Part schoolinfofileBody: MultipartBody.Part?,
+        @Part primaryHealthInfoFileBody: MultipartBody.Part?,
+        @Part vetarnityHealthInfoFileBody: MultipartBody.Part?,
+        @Part govInfoInfoFileBody: MultipartBody.Part?,
+        @Part politicalInfoFileBody: MultipartBody.Part?,
+        @Part deathPersonInfoFileBody: MultipartBody.Part?,
+        @Part newschemesfileBody: MultipartBody.Part?,
+        @Part devinfofileBody: MultipartBody.Part?,
+        @Part otherInfoFileBody: MultipartBody.Part?
+    ):Response<DailyVisitResponse>
 
     @POST(Constants.getDailyvisit)
     suspend fun getDailyVisitListFetch(@Body model: ComplaintReq):Response<DailyVisitListResponse>
@@ -57,6 +74,14 @@ interface Service {
     suspend fun deleteDailyWork(@Body deleteOfficeWorkModel: DeleteDailyVisitModel): Response<CreateOfficeWorkResponse>
 
     @POST(Constants.getvillages)
-    suspend fun getVillageList(): Response<VilageReponse>
+    suspend fun getVillageList(@Body model:VillageReq): Response<VilageReponse>
+
+
+    @POST(Constants.getYojnaList)
+    suspend fun getYojnaList(): Response<YojnaReponse>
+
+    @Headers("Content-Type: application/json")
+    @POST(Constants.implementyojana)
+    suspend fun sendYojna(@Body model: YojsnaPostReq): Response<YojnaResponse>
 
 }

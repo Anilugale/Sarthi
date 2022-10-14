@@ -38,5 +38,20 @@ data class DailyVisitModel(
     val villageid: Int,
     val watercanelinfo: String,
     val devinfo: String,
-    val otherinfo: String
+    val otherinfo: String,
+    val otherinfofile: String,
+    val devinfofile: String,
+    val newschemesfile: String,
+    val birthdayinfofile: String,
+    val deathpersoninfofile: String,
+    val politicalinfofile: String,
+    val govservantinfofile: String,
+    val veterinarymedicineinfoinfo: String,
+    val primarycarecenterinfofile: String,
+    val schoolinfofile: String,
+    val watercanelinfofile: String,
+    val drinkingwaterinfofile: String,
+    val electricityinfofile: String,
+    val rashanshopinfofile: String
+
 )

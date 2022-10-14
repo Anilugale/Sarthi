@@ -17,6 +17,10 @@ object Constants {
     const val getDailyvisit = "api/getdailyvisitlisting"
     const val deleteDailyWork = "api/deletedailyvisit"
     const val getvillages = "api/getvillages"
+    const val getYojnaList = "api/getyojanalist"
+    const val implementyojana = "api/implementyojana"
+
+
     const val FCM_TOKEN = "FCM_TOKEN"
     const val LOCATION = "LOCATION"
     const val CHANNEL_ID = "MESSAGE"

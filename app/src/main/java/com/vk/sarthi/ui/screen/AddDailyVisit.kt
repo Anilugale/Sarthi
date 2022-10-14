@@ -1,6 +1,5 @@
 package com.vk.sarthi.ui.screen
 
-import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -30,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.google.gson.Gson
 import com.vk.sarthi.R
 import com.vk.sarthi.cache.Cache
 import com.vk.sarthi.model.DailyVisitModel
@@ -42,6 +42,12 @@ import com.vk.sarthi.ui.theme.FontColor2
 import com.vk.sarthi.utli.*
 import com.vk.sarthi.viewmodel.AddDailyVisitVM
 import com.vk.sarthi.viewmodel.DailyVisitState
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.util.*
 
@@ -264,94 +270,36 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     Cache.villageData!!.villages.single { dailyModel.villageid == it.id }
             }
 
-            var exp by remember { mutableStateOf(false) }
-            var talukaName by remember { mutableStateOf(selectedVillage?.taluka ?: "") }
-            var gavName by remember { mutableStateOf(selectedVillage) }
-            var villageName by remember { mutableStateOf(selectedVillage?.village ?: "") }
+            var ganName by remember { mutableStateOf(selectedVillage?.gan ?: "") }
+            var villageName by remember { mutableStateOf(selectedVillage) }
 
-            ExposedDropdownMenuBox(expanded = exp, onExpandedChange = { exp = !exp }) {
-                TextField(
-                    value = talukaName,
-                    onValueChange = { talukaName = it },
-                    label = { Text(stringResource(id = R.string.taluka)) },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = exp)
-                    },
-                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 10.dp, vertical = 5.dp)
-                )
-                if (Cache.villageData!!.taluka.isNotEmpty()) {
-                    ExposedDropdownMenu(expanded = exp, onDismissRequest = { exp = false }) {
-                        Cache.villageData!!.taluka.forEach { option ->
-                            DropdownMenuItem(onClick = {
-                                talukaName = option
-                                gavName = null
-                                villageName = ""
-                                exp = false
-                            }) {
-                                Text(text = option)
-                            }
-                        }
-                    }
-                }
-            }
+            val list = Cache.villageData!!.villages.groupBy { it.gan }
+            val gatList = list.keys
 
-            if (talukaName.isNotEmpty()) {
+            DropDownSpinner(
+                modifier = Modifier.padding(10.dp),
+                defaultText = "गण निवडा",
+                selectedItem = ganName,
+                onItemSelected = { _, item ->
+                    ganName = item
+                    villageName = null
+                },
+                itemList =  gatList.toList()
+            )
 
-                val optionsGav = Cache.villageData!!.villages.filter { talukaName == it.taluka }
-                var expGav by remember { mutableStateOf(false) }
+            DropDownSpinner(
+                modifier = Modifier.padding(10.dp),
+                defaultText = "गाव निवडा",
+                selectedItem = villageName,
+                onItemSelected = { _, item ->
+                    villageName = item
+                },
+                itemList = list[ganName]
+            )
 
 
-                ExposedDropdownMenuBox(expanded = expGav, onExpandedChange = { expGav = !expGav }) {
-                    TextField(
-                        value = villageName,
-                        onValueChange = { villageName = it },
-                        label = { Text(stringResource(id = R.string.taluka)) },
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expGav)
-                        },
-                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 10.dp, vertical = 5.dp)
-                    )
-                    if (optionsGav.isNotEmpty()) {
-                        ExposedDropdownMenu(expanded = expGav,
-                            onDismissRequest = { expGav = false }) {
-                            optionsGav.forEach { optionsGav ->
-                                DropdownMenuItem(onClick = {
-                                    gavName = optionsGav
-                                    villageName = optionsGav.village
-                                    expGav = false
-                                }) {
-                                    Text(text = optionsGav.village)
-                                }
-                            }
-                        }
-                    }
-                }
-                if (gavName != null) {
-                    Button(
-                        onClick = {
-                            var intent = Intent(Intent.ACTION_VIEW)
-                            intent.setDataAndType(
-                                Uri.parse("https://shirdiyuva.in/" + gavName!!.infourl),
-                                "application/pdf"
-                            )
-                            intent = Intent.createChooser(intent, "Open File")
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            current.startActivity(intent)
-                        },
-                        modifier = Modifier.align(Alignment.End)
-                    ) {
-                        Text(text = "Detail")
-                    }
-                }
 
 
-            }
 
             Box(modifier = Modifier.fillMaxWidth()) {
                 Text(
@@ -652,11 +600,11 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
             Button(
                 onClick = {
-                    if (gavName == null) {
+                    if (ganName.isEmpty() ) {
                         Toast.makeText(current, "Select Village", Toast.LENGTH_SHORT).show()
                         return@Button
                     }
-                    val list = arrayListOf<PersonsVisited>()
+                    val personalList = arrayListOf<PersonsVisited>()
                     personVisitedList.forEach {
                         Log.d("@@", "AddDailyVisit: $it")
                         resetErrorFlag(it)
@@ -674,7 +622,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                                 it.isSu.value = true
                                 return@Button
                             } else {
-                                list.add(
+                                personalList.add(
                                     PersonsVisited(
                                         information = it.information.value,
                                         name = it.name.value,
@@ -713,14 +661,133 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                         rashanshopinfo = rationShopInfo.value,
                         veterinarymedicineinfo = pashuInfo.value,
                         watercanelinfo = waterCanalInfo.value,
-                        persons_visited = list,
-                        villageid = gavName!!.id.toString(),
+                        persons_visited = personalList,
+                        villageid = villageName!!.id.toString(),
                         visitid = dailyModel?.id?.toString() ?: "",
                         otherinfo = otherInfo.value,
                         devinfo = developmentInfo.value
-
                     )
-                    viewModel.setDailyVisitReq(model)
+
+                    val map: HashMap<String, RequestBody> = HashMap()
+                    var birthdayFileBody: MultipartBody.Part? = null
+                    var rashanshopinfoBody: MultipartBody.Part? = null
+                    var electricInfoFileBody: MultipartBody.Part? = null
+                    var drinkingwaterinfofileBody: MultipartBody.Part? = null
+                    var watercanelinfofileBody: MultipartBody.Part? = null
+                    var schoolinfofileBody: MultipartBody.Part? = null
+                    var primaryHealthInfoFileBody: MultipartBody.Part? = null
+                    var vetarnityHealthInfoFileBody: MultipartBody.Part? = null
+                    var govInfoInfoFileBody: MultipartBody.Part? = null
+                    var politicalInfoFileBody: MultipartBody.Part? = null
+                    var deathPersonInfoFileBody: MultipartBody.Part? = null
+                    var newschemesfileBody: MultipartBody.Part? = null
+                    var devinfofileBody: MultipartBody.Part? = null
+                    var otherInfoFileBody: MultipartBody.Part? = null
+                    map["coordinator_id"] = Cache.loginUser!!.id.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                    map["villageid"] = villageName!!.id.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                    map["persons_visited"] = Gson().toJson(personalList).toRequestBody("text/plain".toMediaTypeOrNull())
+                    if (birthdayInfo.value.isNotEmpty() && birthdayInfoFile == null) {
+                        current.toast("वाढदिवस माहिती is Mandatory")
+                    } else if (rationShopInfo.value.isNotEmpty() && rationInfoFile == null) {
+                        current.toast("रेशन दुकानाची is Mandatory")
+                    } else {
+                        map["birthdayinfo"] = birthdayInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                        if (birthdayInfoFile != null) {
+                            val requestFile = birthdayInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                            birthdayFileBody = MultipartBody.Part.createFormData("birthdayinfofile", birthdayInfoFile!!.name,requestFile)
+                        }
+                        map["rashanshopinfo"] = rationShopInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                        if (rationInfoFile != null) {
+                            val requestFile = rationInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                            rashanshopinfoBody = MultipartBody.Part.createFormData("rashanshopinfofile", rationInfoFile!!.name,requestFile)
+                        }
+
+                        map["electricityinfo"] = electricInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                        if (electricInfoFile != null) {
+                            val requestFile = electricInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                            rashanshopinfoBody = MultipartBody.Part.createFormData("electricityinfofile", electricInfoFile!!.name,requestFile)
+                        }
+
+                        map["drinkingwaterinfo"] = drinkingWaterInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                        if (drinkingInfoFile != null) {
+                            val requestFile = drinkingInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                            drinkingwaterinfofileBody = MultipartBody.Part.createFormData("drinkingwaterinfofile", drinkingInfoFile!!.name,requestFile)
+                        }
+
+                        map["watercanelinfo"] = waterCanalInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                        if (waterCanalInfoFile != null) {
+                            val requestFile = waterCanalInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                            watercanelinfofileBody = MultipartBody.Part.createFormData("watercanelinfofile", waterCanalInfoFile!!.name,requestFile)
+                        }
+
+                        map["schoolinfo"] = schoolInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                        if (schoolInfoFile != null) {
+                            val requestFile = schoolInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                            schoolinfofileBody = MultipartBody.Part.createFormData("schoolinfofile", schoolInfoFile!!.name,requestFile)
+                        }
+
+                        map["primarycarecenterinfo"] = prathamikInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                        if (primaryHealthInfoFile != null) {
+                            val requestFile = primaryHealthInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                            primaryHealthInfoFileBody = MultipartBody.Part.createFormData("primarycarecenterinfofile", primaryHealthInfoFile!!.name,requestFile)
+                        }
+
+                        map["veterinarymedicineinfo"] = pashuInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                        if (vetarnityHealthInfoFile != null) {
+                            val requestFile = vetarnityHealthInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                            vetarnityHealthInfoFileBody = MultipartBody.Part.createFormData("veterinarymedicineinfoinfo", vetarnityHealthInfoFile!!.name,requestFile)
+                        }
+
+                        map["govservantinfo"] = govEmpInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                        if (govInfoInfoFile != null) {
+                            val requestFile = govInfoInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                            govInfoInfoFileBody = MultipartBody.Part.createFormData("govservantinfofile", govInfoInfoFile!!.name,requestFile)
+                        }
+
+
+                        map["politicalinfo"] = politicsInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                        if (politicalInfoFile != null) {
+                            val requestFile = politicalInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                            politicalInfoFileBody = MultipartBody.Part.createFormData("politicalinfofile", politicalInfoFile!!.name,requestFile)
+                        }
+
+                        map["deathpersoninfo"] = deathPersonInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                        if (deathPersonInfoFile != null) {
+                            val requestFile = deathPersonInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                            deathPersonInfoFileBody = MultipartBody.Part.createFormData("deathpersoninfofile", deathPersonInfoFile!!.name,requestFile)
+                        }
+                        map["newschemes"] = gatLabhYojna.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                        if (yojnaInfoFile != null) {
+                            val requestFile = yojnaInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                            newschemesfileBody = MultipartBody.Part.createFormData("newschemesfile", yojnaInfoFile!!.name,requestFile)
+                        }
+                        map["devinfo"] = developmentInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                        if (devFile != null) {
+                            val requestFile = devFile!!.asRequestBody("image/jpg".toMediaType())
+                            devinfofileBody = MultipartBody.Part.createFormData("devinfofile", devFile!!.name,requestFile)
+                        }
+                        map["otherinfo"] = otherInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                        if (otherInfoFile != null) {
+                            val requestFile = otherInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                            otherInfoFileBody = MultipartBody.Part.createFormData("otherinfofile", otherInfoFile!!.name,requestFile)
+                        }
+                    }
+                    viewModel.setDailyVisitReq(dailyModel?.id?:0,map,
+                        birthdayFileBody,
+                        rashanshopinfoBody,
+                        electricInfoFileBody,
+                        drinkingwaterinfofileBody,
+                        watercanelinfofileBody,
+                        schoolinfofileBody,
+                        primaryHealthInfoFileBody,
+                        vetarnityHealthInfoFileBody,
+                        govInfoInfoFileBody,
+                        politicalInfoFileBody,
+                        deathPersonInfoFileBody,
+                        newschemesfileBody,
+                        devinfofileBody,
+                        otherInfoFileBody
+                    )
 
 
                 }, modifier = Modifier

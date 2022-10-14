@@ -57,7 +57,7 @@ fun LoginScreen(navigator: NavHostController?) {
         is Status.SuccessUser -> {
             LaunchedEffect(key1 =value1 ){
                 SettingPreferences.saveUser(value1.user, context)
-                navigator?.navigate(Screens.DailyVisit.route) {
+                navigator?.navigate(Screens.Dashboard.route) {
                     popUpTo(Screens.Login.route) {
                         inclusive = true
                     }

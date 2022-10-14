@@ -13,7 +13,11 @@ data class VillageData(
 )
 
 
+
 data class Village(
+    val coordinatorid: Int,
+    val gan: String,
+    val gat: String,
     val id: Int,
     val infourl: String,
     val taluka: String,

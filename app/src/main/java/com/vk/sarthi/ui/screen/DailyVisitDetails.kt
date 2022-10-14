@@ -1,5 +1,8 @@
 package com.vk.sarthi.ui.screen
 
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -9,14 +12,17 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.outlined.Attachment
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -106,19 +112,20 @@ fun DailyVisitDetailsUI(workID: String, navigatorController: NavHostController?)
                         .padding(vertical = 5.dp)
                 )
 
-                ShowInfo(dailyModel.devinfo,R.string.development_info, titleColor)
-                ShowInfo(dailyModel.rashanshopinfo,R.string.ration_info, titleColor)
-                ShowInfo(dailyModel.electricityinfo,R.string.electric_info, titleColor)
-                ShowInfo(dailyModel.drinkingwaterinfo,R.string.drinking_water_info, titleColor)
-                ShowInfo(dailyModel.watercanelinfo,R.string.water_canal_info, titleColor)
-                ShowInfo(dailyModel.schoolinfo,R.string.school_info, titleColor)
-                ShowInfo(dailyModel.primarycarecenterinfo,R.string.prathamik_info, titleColor)
-                ShowInfo(dailyModel.veterinarymedicineinfo,R.string.pashu_info, titleColor)
-                ShowInfo(dailyModel.govservantinfo,R.string.gov_emp_info, titleColor)
-                ShowInfo(dailyModel.politicalinfo,R.string.politics_info, titleColor)
-                ShowInfo(dailyModel.deathpersoninfo,R.string.death_person_info, titleColor)
-                ShowInfo(dailyModel.newschemes,R.string.gat_labh_yojna, titleColor)
-                ShowInfo(dailyModel.otherinfo,R.string.other_info, titleColor)
+                ShowInfo(dailyModel.devinfo,R.string.development_info,dailyModel.devinfofile, titleColor)
+                ShowInfo(dailyModel.rashanshopinfo,R.string.ration_info,dailyModel.rashanshopinfofile, titleColor)
+                ShowInfo(dailyModel.electricityinfo,R.string.electric_info, dailyModel.electricityinfofile,titleColor)
+                ShowInfo(dailyModel.drinkingwaterinfo,R.string.drinking_water_info, dailyModel.drinkingwaterinfofile,titleColor)
+                ShowInfo(dailyModel.watercanelinfo,R.string.water_canal_info,dailyModel.watercanelinfofile, titleColor)
+                ShowInfo(dailyModel.schoolinfo,R.string.school_info,dailyModel.schoolinfofile, titleColor)
+                ShowInfo(dailyModel.primarycarecenterinfo,R.string.prathamik_info, dailyModel.primarycarecenterinfofile,titleColor)
+                ShowInfo(dailyModel.veterinarymedicineinfo,R.string.pashu_info,dailyModel.veterinarymedicineinfoinfo, titleColor)
+                ShowInfo(dailyModel.govservantinfo,R.string.gov_emp_info,dailyModel.govservantinfofile, titleColor)
+                ShowInfo(dailyModel.politicalinfo,R.string.politics_info,dailyModel.politicalinfofile, titleColor)
+                ShowInfo(dailyModel.deathpersoninfo,R.string.death_person_info,dailyModel.deathpersoninfofile, titleColor)
+                ShowInfo(dailyModel.birthdayinfo,R.string.birthday_info, dailyModel.birthdayinfofile,titleColor)
+                ShowInfo(dailyModel.newschemes,R.string.gat_labh_yojna,dailyModel.newschemesfile, titleColor)
+                ShowInfo(dailyModel.otherinfo,R.string.other_info,dailyModel.otherinfofile, titleColor)
 
             }
         }
@@ -204,8 +211,10 @@ fun PersonVisitedDetailsUI(titleColor: Color, personsVisited: List<PersonsVisite
 private fun ShowInfo(
     msg: String?,
     placeholderID :Int,
+    attachmentUrl :String,
     titleColor: Color
 ) {
+    val current = LocalContext.current
 
     if (!msg.isNullOrEmpty()) {
         Spacer(modifier = Modifier.height(10.dp))
@@ -221,7 +230,37 @@ private fun ShowInfo(
             color = titleColor,
             fontSize = 16.sp
         )
+
+        Row(
+            modifier = Modifier
+                .padding(vertical = 5.dp)
+                .clickable {
+                    val url = "https://shirdiyuva.in/${attachmentUrl}"
+                    Log.d("@@", "ShowCommentItem: $url")
+                    val intent = Intent().apply {
+                        action = Intent.ACTION_VIEW
+                        data = Uri.parse(url)
+                    }
+                    current.startActivity(intent)
+                }
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Attachment,
+                contentDescription = "attachment",
+                tint = FontColor2
+            )
+            Text(
+                text = "Attachment", modifier = Modifier
+                    .padding(horizontal = 5.dp)
+                    .align(Alignment.CenterVertically),
+                fontSize = 12.sp,
+                textAlign = TextAlign.Center,
+                color = FontColor2
+            )
+        }
+
     }
+
 }
 
 

@@ -57,17 +57,22 @@ class MainViewModel @Inject constructor(private val service: Service) : ViewMode
         if (Cache.villageData==null) {
             viewModelScope.launch  {
                 viewModelScope.launch(Dispatchers.Main) {
-                    val response = service.getVillageList()
-                    if (response.isSuccessful) {
-                        if (response.body() != null && response.body()!!.data != null) {
-                            Cache.villageData = response.body()!!.data
-                            state.value = VillageState.Success
+                    try {
+                        val response = service.getVillageList(VillageReq(coordinator_id = Cache.loginUser!!.id))
+                        if (response.isSuccessful) {
+                            if (response.body() != null && response.body()!!.data != null) {
+                                Cache.villageData = response.body()!!.data
+                                state.value = VillageState.Success
+                            }else{
+                                state.value = VillageState.Failed(response.message())
+                            }
                         }else{
                             state.value = VillageState.Failed(response.message())
                         }
-                    }else{
-                        state.value = VillageState.Failed(response.message())
+                    }catch (e:Exception){
+                        state.value = VillageState.Failed("Server Error")
                     }
+
                 }
             }
         }else{
