@@ -253,16 +253,14 @@ fun ShowDailyItem(
                 Spacer(modifier = Modifier.height(5.dp))
             }
 
-            if (Cache.villageData != null) {
-                val selectedVillage =
-                    Cache.villageData!!.villages.single { dailyVisitModel.villageid == it.id }
-
+            if (dailyVisitModel.villagename!=null && dailyVisitModel.villagename.isNotEmpty()) {
                 Text(
-                    text = "Village Name/गावाचे नाव : ${selectedVillage.taluka} - ${selectedVillage.village}",
+                    text = "Village Name/गावाचे नाव : ${dailyVisitModel.villagename}",
                     fontSize = 12.sp,
                     color = FontColor2
                 )
             }
+
 
             Spacer(modifier = Modifier.height(5.dp))
             val date = if (dailyVisitModel.updated_at.isNullOrBlank()) {

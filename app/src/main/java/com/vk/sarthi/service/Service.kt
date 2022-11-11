@@ -17,7 +17,7 @@ interface Service {
 
 
     @POST(Constants.forgotpassword)
-    suspend fun forgetPassword(@Body req: ForgetPasswordOTPReq): Response<LoginResponse>
+    suspend fun forgetPassword(@Body req: ForgetPasswordOTPReq): Response<OTPRespose>
 
     @POST(Constants.resetpassword)
     suspend fun verifyPassword(@Body req: VerifyPassword): Response<LoginResponse>
@@ -83,5 +83,6 @@ interface Service {
     @Headers("Content-Type: application/json")
     @POST(Constants.implementyojana)
     suspend fun sendYojna(@Body model: YojsnaPostReq): Response<YojnaResponse>
+
 
 }

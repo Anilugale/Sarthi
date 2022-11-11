@@ -114,10 +114,10 @@
 
     <string name="add_daily_work">दैनंदिन कार्यालयीन काम</string>
     <string name="submit">Submit</string>
-    <string name="name">Name</string>
-    <string name="subject">Subject</string>
-    <string name="info">Information</string>
-    <string name="survey">Survey</string>
+    <string name="name">नाव</string>
+    <string name="subject">विषय</string>
+    <string name="info">माहिती</string>
+    <string name="survey">सर्वेक्षण</string>
     <string name="taluka">जिल्हा</string>
     <string name="logout_msg">Do you want to logout?</string>
     <string name="ok">Ok</string>

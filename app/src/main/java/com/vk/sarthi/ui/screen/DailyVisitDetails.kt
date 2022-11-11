@@ -172,7 +172,7 @@ fun PersonVisitedDetailsUI(titleColor: Color, personsVisited: List<PersonsVisite
             ) {
                 if (it.name.isNotEmpty()) {
                     Text(
-                        text = "Name - ${it.name} ",
+                        text = "नाव - ${it.name} ",
                         fontWeight = FontWeight.SemiBold,
                         color = titleColor,
                         fontSize = 14.sp
@@ -180,7 +180,7 @@ fun PersonVisitedDetailsUI(titleColor: Color, personsVisited: List<PersonsVisite
                 }
                 if (it.subject.isNotEmpty()) {
                     Text(
-                        text = "Subject - ${it.subject} ",
+                        text = "विषय - ${it.subject} ",
                         fontWeight = FontWeight.SemiBold,
                         color = titleColor,
                         fontSize = 14.sp
@@ -188,7 +188,7 @@ fun PersonVisitedDetailsUI(titleColor: Color, personsVisited: List<PersonsVisite
                 }
                 if (it.information.isNotEmpty()) {
                     Text(
-                        text = "Information - ${it.information} ",
+                        text = "माहिती - ${it.information} ",
                         fontWeight = FontWeight.SemiBold,
                         color = titleColor,
                         fontSize = 14.sp
@@ -196,7 +196,7 @@ fun PersonVisitedDetailsUI(titleColor: Color, personsVisited: List<PersonsVisite
                 }
                 if (it.servey.isNotEmpty()) {
                     Text(
-                        text = "Survey - ${it.servey} ",
+                        text = "सर्वेक्षण - ${it.servey} ",
                         fontWeight = FontWeight.SemiBold,
                         color = titleColor,
                         fontSize = 14.sp

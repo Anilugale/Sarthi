@@ -71,6 +71,7 @@ fun ForgetPassword(navigator: NavHostController?) {
 
             is ForgetPWSState.OTPSend -> {
                 OTPPwsUI(viewModel, focusManager,mobileNumber)
+                context.toast((state.value as ForgetPWSState.OTPSend).msg)
 
             }
             is ForgetPWSState.SuccessFull -> {
@@ -157,7 +158,7 @@ fun OTPPwsUI(
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
-
+            val current = LocalContext.current
             OutlinedTextField(
                 modifier = Modifier
                     .padding(vertical = 5.dp)
@@ -174,7 +175,7 @@ fun OTPPwsUI(
                 onClick = {
                     val otp =  otpOne.value.plus(otpTwo.value).plus(otpThree.value).plus(otpFour.value)
                     Log.d("@@", "OTPPwsUI: $otp")
-                    viewModel?.verifyOTPPassword(mobileNumber.value,otp,newPassword.value)
+                    viewModel?.verifyOTPPassword(mobileNumber.value,otp,newPassword.value,SettingPreferences.getFCMToken(context = current))
                 },
                 enabled = (newPassword.value.isNotEmpty() && reEnterPassword.value.isNotEmpty() && newPassword.value == reEnterPassword.value)
             ) {
@@ -298,8 +299,8 @@ class ForgetPasswordViewModel @Inject constructor(var service: Service) : ViewMo
             val forgetPassword = service.forgetPassword(ForgetPasswordOTPReq(value))
             viewModelScope.launch(Dispatchers.Main) {
                 if (forgetPassword.isSuccessful) {
-                    if (forgetPassword.body() != null && forgetPassword.body()!!.data != null) {
-                        _state.value = ForgetPWSState.OTPSend
+                    if (forgetPassword.body() != null && forgetPassword.body()!!.messages != null) {
+                        _state.value = ForgetPWSState.OTPSend(forgetPassword.body()!!.messages)
                     } else {
                         _state.value = ForgetPWSState.Failed
                     }
@@ -308,10 +309,10 @@ class ForgetPasswordViewModel @Inject constructor(var service: Service) : ViewMo
         }
     }
 
-    fun verifyOTPPassword(mobileNumber:String,otp: String, value: String) {
+    fun verifyOTPPassword(mobileNumber: String, otp: String, value: String, token: String) {
         _state.value = ForgetPWSState.Progress
         viewModelScope.launch(Dispatchers.IO) {
-            val forgetPassword = service.verifyPassword(VerifyPassword(mobileno = mobileNumber,otp = otp, password = value))
+            val forgetPassword = service.verifyPassword(VerifyPassword(mobileno = mobileNumber,otp = otp, password = value, token = token))
             viewModelScope.launch(Dispatchers.Main) {
                 if (forgetPassword.isSuccessful) {
                     if (forgetPassword.body() != null) {
@@ -338,7 +339,7 @@ class ForgetPasswordViewModel @Inject constructor(var service: Service) : ViewMo
 
 sealed interface ForgetPWSState {
     object Progress : ForgetPWSState
-    object OTPSend : ForgetPWSState
+    class OTPSend(val msg:String) : ForgetPWSState
     object Failed : ForgetPWSState
     object Empty : ForgetPWSState
     class SuccessFull(val user:UserModel) : ForgetPWSState

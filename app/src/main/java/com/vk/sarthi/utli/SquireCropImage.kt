@@ -58,7 +58,6 @@ import com.yalantis.ucrop.UCrop
 class SquireCropImage : ActivityResultContract<Pair<Uri, Uri>, Uri?>() {
     override fun createIntent(context: Context, input: Pair<Uri, Uri>): Intent =
         UCrop.of(input.first, input.second)
-            .withAspectRatio(1f, 1f)
             .getIntent(context)
 
 

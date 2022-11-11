@@ -122,7 +122,7 @@ fun LoginUi(
                     .fillMaxWidth(),
                 value = userName.value,
                 onValueChange = { userName.value = it },
-                label = { Text(text = "username") },
+                label = { Text(text = "Username") },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
@@ -133,7 +133,7 @@ fun LoginUi(
                     .fillMaxWidth(),
                 value = password.value,
                 onValueChange = { password.value = it },
-                label = { Text(text = "password") },
+                label = { Text(text = "Password") },
                 singleLine = true,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),

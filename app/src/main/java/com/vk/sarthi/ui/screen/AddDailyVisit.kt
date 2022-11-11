@@ -1,5 +1,7 @@
 package com.vk.sarthi.ui.screen
 
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -27,13 +29,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toFile
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.gson.Gson
 import com.vk.sarthi.R
 import com.vk.sarthi.cache.Cache
 import com.vk.sarthi.model.DailyVisitModel
-import com.vk.sarthi.model.DailyVisitReqModel
 import com.vk.sarthi.model.PersonsVisited
 import com.vk.sarthi.model.Village
 import com.vk.sarthi.ui.theme.FontColor1
@@ -48,10 +50,9 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.File
+import java.io.*
 import java.util.*
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
     var dailyModel: DailyVisitModel? = null
@@ -79,6 +80,11 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 navigatorController?.popBackStack()
             }
 
+        }
+        DailyVisitState.Process ->{
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+                CircularProgressIndicator()
+            }
         }
 
 
@@ -348,7 +354,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.DEV_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = "Dev Info Image")
+                    Text(text = stringResource(R.string.development_info)+" photo")
                 }
             }
 
@@ -369,7 +375,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.RASATION_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = "Ration Info Image")
+                    Text(text = stringResource(R.string.ration_info)+" photo")
                 }
             }
             OutlinedTextField(
@@ -385,7 +391,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.ELECTRIC_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = "Ration Info Image")
+                    Text(text = stringResource(R.string.electric_info)+" photo")
 
                 }
             }
@@ -404,7 +410,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.DRINKING_WATER
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = "Drinking water Image")
+                    Text(text = stringResource(R.string.drinking_water_info)+" photo")
 
                 }
             }
@@ -425,7 +431,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.WATER_CANAL
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = "Water Canal Image")
+                    Text(text = stringResource(R.string.water_canal_info)+" photo")
 
                 }
             }
@@ -446,7 +452,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.SCHOOL_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = "Water Canal Image")
+                    Text(text = stringResource(R.string.school_info)+" photo")
 
                 }
             }
@@ -465,7 +471,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.PRIMARAY_HELATH
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = "Primary Health Care Image")
+                    Text(text = stringResource(R.string.prathamik_info)+" photo")
                 }
             }
 
@@ -483,7 +489,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.VETARNARY_HEALTH
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.pashu_info)+ "Image")
+                    Text(text = stringResource(R.string.pashu_info)+ " Photo")
                 }
             }
 
@@ -501,7 +507,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.GOV_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.gov_emp_info)+ "Image")
+                    Text(text = stringResource(R.string.gov_emp_info)+ " Photo")
                 }
             }
 
@@ -520,7 +526,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.POLITICAL_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.gov_emp_info)+ "Image")
+                    Text(text = stringResource(R.string.gov_emp_info)+ " Photo")
                 }
             }
 
@@ -538,7 +544,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.DEATH_PERSON_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.death_person_info)+ "Image")
+                    Text(text = stringResource(R.string.death_person_info)+ " Photo")
                 }
             }
 
@@ -556,7 +562,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.BIRTHDAY_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.birthday_info)+ "Image")
+                    Text(text = stringResource(R.string.birthday_info)+ " Photo")
                 }
             }
 
@@ -574,7 +580,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.YOJNA_INFO_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.gat_labh_yojna)+ "Image")
+                    Text(text = stringResource(R.string.gat_labh_yojna)+ " Photo")
                 }
             }
 
@@ -593,7 +599,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.OTHER_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.other_info)+ "Image")
+                    Text(text = stringResource(R.string.other_info)+ " Photo")
                 }
             }
 
@@ -645,28 +651,6 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                             longitude = split[1]
                         }
                     }
-                    val model = DailyVisitReqModel(
-                        birthdayinfo = birthdayInfo.value,
-                        coordinatorid = Cache.loginUser!!.id.toString(),
-                        deathpersoninfo = deathPersonInfo.value,
-                        drinkingwaterinfo = drinkingWaterInfo.value,
-                        electricityinfo = electricInfo.value,
-                        govservantinfo = govEmpInfo.value,
-                        latitude = latitude,
-                        longitude = longitude,
-                        newschemes = gatLabhYojna.value,
-                        politicalinfo = politicsInfo.value,
-                        primarycarecenterinfo = prathamikInfo.value,
-                        schoolinfo = schoolInfo.value,
-                        rashanshopinfo = rationShopInfo.value,
-                        veterinarymedicineinfo = pashuInfo.value,
-                        watercanelinfo = waterCanalInfo.value,
-                        persons_visited = personalList,
-                        villageid = villageName!!.id.toString(),
-                        visitid = dailyModel?.id?.toString() ?: "",
-                        otherinfo = otherInfo.value,
-                        devinfo = developmentInfo.value
-                    )
 
                     val map: HashMap<String, RequestBody> = HashMap()
                     var birthdayFileBody: MultipartBody.Part? = null
@@ -687,9 +671,33 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     map["villageid"] = villageName!!.id.toString().toRequestBody("text/plain".toMediaTypeOrNull())
                     map["persons_visited"] = Gson().toJson(personalList).toRequestBody("text/plain".toMediaTypeOrNull())
                     if (birthdayInfo.value.isNotEmpty() && birthdayInfoFile == null) {
-                        current.toast("वाढदिवस माहिती is Mandatory")
+                        current.toast("Photo Mandatory")
                     } else if (rationShopInfo.value.isNotEmpty() && rationInfoFile == null) {
-                        current.toast("रेशन दुकानाची is Mandatory")
+                        current.toast("Photo Mandatory")
+                    } else if (electricInfo.value.isNotEmpty() && electricInfoFile == null) {
+                        current.toast("Photo Mandatory")
+                    }  else if (drinkingWaterInfo.value.isNotEmpty() && drinkingInfoFile == null) {
+                        current.toast("Photo Mandatory")
+                    }  else if (waterCanalInfo.value.isNotEmpty() && waterCanalInfoFile == null) {
+                        current.toast("Photo Mandatory")
+                    }  else if (schoolInfo.value.isNotEmpty() && schoolInfoFile == null) {
+                        current.toast("Photo Mandatory")
+                    }  else if (prathamikInfo.value.isNotEmpty() && primaryHealthInfoFile == null) {
+                        current.toast("Photo Mandatory")
+                    }  else if (pashuInfo.value.isNotEmpty() && vetarnityHealthInfoFile == null) {
+                        current.toast("Photo Mandatory")
+                    } else if (govEmpInfo.value.isNotEmpty() && govInfoInfoFile == null) {
+                        current.toast("Photo Mandatory")
+                    }  else if (politicsInfo.value.isNotEmpty() && politicalInfoFile == null) {
+                        current.toast("Photo Mandatory")
+                    }   else if (deathPersonInfo.value.isNotEmpty() && deathPersonInfoFile == null) {
+                        current.toast("Photo Mandatory")
+                    }    else if (gatLabhYojna.value.isNotEmpty() && yojnaInfoFile == null) {
+                        current.toast("Photo Mandatory")
+                    }     else if (developmentInfo.value.isNotEmpty() && devFile == null) {
+                        current.toast("Photo Mandatory")
+                    }     else if (otherInfo.value.isNotEmpty() && otherInfoFile == null) {
+                        current.toast("Photo Mandatory")
                     } else {
                         map["birthdayinfo"] = birthdayInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
                         if (birthdayInfoFile != null) {
@@ -767,27 +775,56 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                             devinfofileBody = MultipartBody.Part.createFormData("devinfofile", devFile!!.name,requestFile)
                         }
                         map["otherinfo"] = otherInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+
                         if (otherInfoFile != null) {
                             val requestFile = otherInfoFile!!.asRequestBody("image/jpg".toMediaType())
                             otherInfoFileBody = MultipartBody.Part.createFormData("otherinfofile", otherInfoFile!!.name,requestFile)
                         }
+
+                        val isEmpty = otherInfo.value.isEmpty() &&
+                                developmentInfo.value.isEmpty() &&
+                                gatLabhYojna.value.isEmpty() &&
+                                deathPersonInfo.value.isEmpty() &&
+                                politicsInfo.value.isEmpty() &&
+                                govEmpInfo.value.isEmpty() &&
+                                pashuInfo.value.isEmpty() &&
+                                prathamikInfo.value.isEmpty() &&
+                                schoolInfo.value.isEmpty() &&
+                                waterCanalInfo.value.isEmpty() &&
+                                drinkingWaterInfo.value.isEmpty() &&
+                                electricInfo.value.isEmpty() &&
+                                rationShopInfo.value.isEmpty() &&
+                                birthdayInfo.value.isEmpty()
+
+
+                        if(!isEmpty || personalList.isNotEmpty()) {
+                            map["latitude"] =
+                                latitude.toRequestBody("text/plain".toMediaTypeOrNull())
+                            map["longitude"] =
+                                longitude.toRequestBody("text/plain".toMediaTypeOrNull())
+
+                            viewModel.setDailyVisitReq(
+                                dailyModel?.id ?: 0, map,
+                                birthdayFileBody,
+                                rashanshopinfoBody,
+                                electricInfoFileBody,
+                                drinkingwaterinfofileBody,
+                                watercanelinfofileBody,
+                                schoolinfofileBody,
+                                primaryHealthInfoFileBody,
+                                vetarnityHealthInfoFileBody,
+                                govInfoInfoFileBody,
+                                politicalInfoFileBody,
+                                deathPersonInfoFileBody,
+                                newschemesfileBody,
+                                devinfofileBody,
+                                otherInfoFileBody
+                            )
+                        }else{
+                            current.toast("कृपया किमान 1 कार्य पूर्ण करा!")
+                        }
                     }
-                    viewModel.setDailyVisitReq(dailyModel?.id?:0,map,
-                        birthdayFileBody,
-                        rashanshopinfoBody,
-                        electricInfoFileBody,
-                        drinkingwaterinfofileBody,
-                        watercanelinfofileBody,
-                        schoolinfofileBody,
-                        primaryHealthInfoFileBody,
-                        vetarnityHealthInfoFileBody,
-                        govInfoInfoFileBody,
-                        politicalInfoFileBody,
-                        deathPersonInfoFileBody,
-                        newschemesfileBody,
-                        devinfofileBody,
-                        otherInfoFileBody
-                    )
+
 
 
                 }, modifier = Modifier
@@ -802,6 +839,11 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
     }
 
 
+}
+
+@Composable
+fun showToast(current: Context) {
+    current.toast("Photo Mandatory")
 }
 
 fun resetErrorFlag(it: PersonVisitedModel) {

@@ -92,7 +92,8 @@ class MainActivity : ComponentActivity() {
             }
             val token = task.result
             val msg = getString(R.string.msg_token_fmt, token)
-            mPref.edit().putString(SettingPreferences.TOKEN,token).apply()
+            mPref.edit().putString(SettingPreferences.TOKEN,token).commit()
+            SettingPreferences.token = token
             Log.d(TAG, msg)
         })
 

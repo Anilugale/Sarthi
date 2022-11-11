@@ -52,6 +52,8 @@ data class DailyVisitModel(
     val watercanelinfofile: String,
     val drinkingwaterinfofile: String,
     val electricityinfofile: String,
-    val rashanshopinfofile: String
+    val rashanshopinfofile: String,
+    val villagename: String = "",
+
 
 )

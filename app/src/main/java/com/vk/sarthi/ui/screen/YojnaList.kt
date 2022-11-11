@@ -28,6 +28,7 @@ import com.vk.sarthi.model.YojsnaPostReq
 import com.vk.sarthi.ui.nav.Screens
 import com.vk.sarthi.ui.screen.DrawerView
 import com.vk.sarthi.ui.screen.DropDownSpinner
+import com.vk.sarthi.ui.screen.toast
 import com.vk.sarthi.ui.theme.FontColor1
 import com.vk.sarthi.ui.theme.FontColor1Dark
 import com.vk.sarthi.ui.theme.FontColor2
@@ -118,7 +119,6 @@ fun showYojnaList(model: YojnaViewModel, yojnaList: ArrayList<YojnaModel>) {
     val swipeRefreshState = rememberSwipeRefreshState(false)
     val selectedList = mutableStateListOf<Int>()
     Column(modifier = Modifier.fillMaxSize()) {
-        SwipeRefresh(state = swipeRefreshState, onRefresh = { model.getYojnaList()}) {
             LazyColumn {
                 item(key = "header") {
                     DropDownSpinner(
@@ -195,14 +195,18 @@ fun showYojnaList(model: YojnaViewModel, yojnaList: ArrayList<YojnaModel>) {
                 item {
                     Button(
                         onClick = {
-                            Log.d("@@", "showYojnaList: ${selectedList.toList()}")
-                            val req = YojsnaPostReq(coordinatorid = Cache.loginUser!!.id,
-                                village_id = villageName!!.id.toString(),
-                                yojana = selectedList.toList()
-                            )
-                            model.sendYojna(req)
+                            if (selectedList.isNotEmpty()) {
+                                Log.d("@@", "showYojnaList: ${selectedList.toList()}")
+                                val req = YojsnaPostReq(coordinatorid = Cache.loginUser!!.id,
+                                    village_id = villageName!!.id.toString(),
+                                    yojana = selectedList.toList()
+                                )
+                                model.sendYojna(req)
+                            }else{
+                                current.toast("किमान एक योजना निवडा!")
+                            }
+
                         },
-                        enabled = selectedList.isNotEmpty(),
                         modifier = Modifier
                             .padding(vertical = 5.dp, horizontal = 10.dp)
                             .fillMaxWidth()
@@ -211,6 +215,6 @@ fun showYojnaList(model: YojnaViewModel, yojnaList: ArrayList<YojnaModel>) {
                     }
                 }
             }
-        }
+
     }
 }

@@ -26,11 +26,13 @@ object SettingPreferences {
         }
     }
 
+    var token = ""
     fun getFCMToken(context: Context):String {
         get(context)
-        var token = ""
-        sharedPreferences?.apply {
-            token = getString(TOKEN,"").toString()
+        if(token.isEmpty()) {
+            sharedPreferences?.apply {
+                token = getString(TOKEN, "").toString()
+            }
         }
         return token
     }

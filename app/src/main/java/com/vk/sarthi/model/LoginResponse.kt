@@ -23,4 +23,5 @@ data class VerifyPassword(
     val mobileno: String,
     val password: String,
     val otp: String,
+    val token: String,
 )
