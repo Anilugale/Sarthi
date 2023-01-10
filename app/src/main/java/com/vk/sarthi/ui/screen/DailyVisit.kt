@@ -82,7 +82,7 @@ fun DailyVisit(navigatorController: NavHostController?) {
                         )
                     }
                 },
-                actions = {
+           /*     actions = {
                     Icon(
                         imageVector = Icons.Outlined.Logout,
                         contentDescription = "menu",
@@ -90,7 +90,7 @@ fun DailyVisit(navigatorController: NavHostController?) {
                             .padding(10.dp)
                             .clickable { showDialog.value = true }
                     )
-                }
+                }*/
             )
         }, drawerContent = { DrawerView(navigatorController, Screens.DailyVisit.route) },
         floatingActionButton = {
@@ -107,7 +107,11 @@ fun DailyVisit(navigatorController: NavHostController?) {
                 )
             ) {
                 FloatingActionButton(onClick = {
-                    navigatorController?.navigate(Screens.AddDailyVisit.route + "/0")
+                    if (Cache.villageData!=null) {
+                        navigatorController?.navigate(Screens.AddDailyVisit.route + "/0")
+                    }else{
+                        context.toast("No village found")
+                    }
 
                 }) {
                     Icon(Icons.Filled.Add, "")

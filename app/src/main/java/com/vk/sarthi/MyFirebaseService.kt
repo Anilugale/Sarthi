@@ -4,6 +4,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
@@ -50,9 +51,13 @@ class MyFirebaseService : FirebaseMessagingService() {
             )
             manager.createNotificationChannel(channel)
         }
-        val intent = Intent(this, MainActivity::class.java)
+        val intent = Intent(applicationContext, MainActivity::class.java)
         intent.putExtra("FromNotification",true)
-        val pi = PendingIntent.getActivity(this, 0, intent, Intent.FLAG_ACTIVITY_NEW_TASK)
+        if(messageTitle.equals("message",true)){
+            getSharedPreferences(applicationContext.packageName, Context.MODE_PRIVATE).edit().putBoolean("isMsg",true).commit()
+        }
+        val pi = PendingIntent.getActivity(applicationContext, Math.random().toInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT or
+                PendingIntent.FLAG_IMMUTABLE)
 
 
         val notification: Notification = NotificationCompat.Builder(this, Constants.CHANNEL_ID)

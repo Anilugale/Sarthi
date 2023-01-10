@@ -1,6 +1,7 @@
 package com.vk.sarthi
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.location.Location
@@ -40,20 +41,28 @@ class MainActivity : ComponentActivity() {
     }
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var isShowComplaint = false
+    private var isMsg = false
 
     private val mPref:SharedPreferences by lazy {
         SettingPreferences.get(this@MainActivity)
     }
 
-
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "intent: $intent")
 
         if (intent.extras != null) {
-            Log.d(TAG, "onCreate: ${intent.extras!!.getBoolean("FromNotification")}")
+            Log.d(TAG, "onCreate: ${intent.extras!!.getBoolean("FromNotification",false)}")
             isShowComplaint = true
+            isMsg =  getSharedPreferences(applicationContext.packageName, Context.MODE_PRIVATE).getBoolean("isMsg",true)
+            if (isMsg) {
+                getSharedPreferences(applicationContext.packageName, Context.MODE_PRIVATE).edit().putBoolean("isMsg",false).commit()
+            }
         }
         installSplashScreen()
 
@@ -66,7 +75,11 @@ class MainActivity : ComponentActivity() {
                     val context = LocalContext.current
                     val route = if(SettingPreferences.isUserSave(context)){
                         if (isShowComplaint) {
-                            Screens.ComplaintList.route
+                            if(isMsg){
+                                Screens.MessageList.route
+                            }else {
+                                Screens.ComplaintList.route
+                            }
                         }else {
                             Screens.Dashboard.route
                         }

@@ -25,6 +25,7 @@ import com.vk.sarthi.R
 import com.vk.sarthi.ui.screen.*
 import com.vk.sarthi.ui.theme.SarthiTheme
 import com.vk.sarthi.ui.theme.Teal200
+import com.vk.sarthi.utli.com.vk.sarthi.ui.screen.MessageListView
 import com.vk.sarthi.utli.com.vk.sarthi.ui.screen.YojnaList
 
 sealed class Screens(val route: String, val icon: ImageVector?) {
@@ -42,6 +43,7 @@ sealed class Screens(val route: String, val icon: ImageVector?) {
     object AddDailyWork : Screens("AddDailyWork", null)
     object DailyVisitDetails : Screens("DailyVisitDetails", null)
     object YojnaList : Screens("YojnaList", null)
+    object MessageList: Screens("MessageList", null)
 }
 
 @Composable
@@ -170,6 +172,8 @@ fun ShowNavGraph(name: String) {
                 isEditable = it.arguments?.getBoolean("isEditable")!!
             )
         }
+        composable(Screens.MessageList.route) { MessageListView(navigator) }
+
     }
 }
 

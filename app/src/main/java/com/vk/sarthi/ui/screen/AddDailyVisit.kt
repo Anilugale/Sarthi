@@ -29,7 +29,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.net.toFile
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.gson.Gson
@@ -146,7 +145,6 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
         val uCropLauncher = rememberLauncherForActivityResult(SquireCropImage()) { uri ->
             currentFile = uri
-            current.toast(uri!!.path!!)
             uri?.apply {
                 // upload file
                 if (SelectionFileType == Constants.DEV_INFO) {
@@ -309,7 +307,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
             Box(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = "Persons Visited",
+                    text = "व्यक्तींनी भेट दिली",
                     modifier = Modifier
                         .padding(10.dp)
                         .align(Alignment.CenterStart),
@@ -670,33 +668,36 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     map["coordinator_id"] = Cache.loginUser!!.id.toString().toRequestBody("text/plain".toMediaTypeOrNull())
                     map["villageid"] = villageName!!.id.toString().toRequestBody("text/plain".toMediaTypeOrNull())
                     map["persons_visited"] = Gson().toJson(personalList).toRequestBody("text/plain".toMediaTypeOrNull())
-                    if (birthdayInfo.value.isNotEmpty() && birthdayInfoFile == null) {
+                    if (dailyModel != null) {
+                        map["visitid"] =dailyModel.id.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                    }
+                    if (birthdayInfo.value.isNotEmpty() && birthdayInfoFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
-                    } else if (rationShopInfo.value.isNotEmpty() && rationInfoFile == null) {
+                    } else if (rationShopInfo.value.isNotEmpty() && rationInfoFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
-                    } else if (electricInfo.value.isNotEmpty() && electricInfoFile == null) {
+                    } else if (electricInfo.value.isNotEmpty() && electricInfoFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
-                    }  else if (drinkingWaterInfo.value.isNotEmpty() && drinkingInfoFile == null) {
+                    }  else if (drinkingWaterInfo.value.isNotEmpty() && drinkingInfoFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
-                    }  else if (waterCanalInfo.value.isNotEmpty() && waterCanalInfoFile == null) {
+                    }  else if (waterCanalInfo.value.isNotEmpty() && waterCanalInfoFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
-                    }  else if (schoolInfo.value.isNotEmpty() && schoolInfoFile == null) {
+                    }  else if (schoolInfo.value.isNotEmpty() && schoolInfoFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
-                    }  else if (prathamikInfo.value.isNotEmpty() && primaryHealthInfoFile == null) {
+                    }  else if (prathamikInfo.value.isNotEmpty() && primaryHealthInfoFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
-                    }  else if (pashuInfo.value.isNotEmpty() && vetarnityHealthInfoFile == null) {
+                    }  else if (pashuInfo.value.isNotEmpty() && vetarnityHealthInfoFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
                     } else if (govEmpInfo.value.isNotEmpty() && govInfoInfoFile == null) {
                         current.toast("Photo Mandatory")
-                    }  else if (politicsInfo.value.isNotEmpty() && politicalInfoFile == null) {
+                    }  else if (politicsInfo.value.isNotEmpty() && politicalInfoFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
-                    }   else if (deathPersonInfo.value.isNotEmpty() && deathPersonInfoFile == null) {
+                    }   else if (deathPersonInfo.value.isNotEmpty() && deathPersonInfoFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
-                    }    else if (gatLabhYojna.value.isNotEmpty() && yojnaInfoFile == null) {
+                    }    else if (gatLabhYojna.value.isNotEmpty() && yojnaInfoFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
-                    }     else if (developmentInfo.value.isNotEmpty() && devFile == null) {
+                    }     else if (developmentInfo.value.isNotEmpty() && devFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
-                    }     else if (otherInfo.value.isNotEmpty() && otherInfoFile == null) {
+                    }     else if (otherInfo.value.isNotEmpty() && otherInfoFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
                     } else {
                         map["birthdayinfo"] = birthdayInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())

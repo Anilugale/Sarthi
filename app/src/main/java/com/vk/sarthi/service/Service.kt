@@ -2,6 +2,7 @@ package com.vk.sarthi.service
 
 import com.vk.sarthi.model.*
 import com.vk.sarthi.utli.Constants
+import com.vk.sarthi.utli.com.vk.sarthi.model.MessageListResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -84,5 +85,6 @@ interface Service {
     @POST(Constants.implementyojana)
     suspend fun sendYojna(@Body model: YojsnaPostReq): Response<YojnaResponse>
 
-
+    @POST("api/getcoordinatormsglist")
+    suspend fun getMsgList(@Body complaintReq: ComplaintReq): Response<MessageListResponse>
 }

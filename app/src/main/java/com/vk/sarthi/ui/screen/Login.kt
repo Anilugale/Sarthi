@@ -161,7 +161,7 @@ fun LoginUi(
             ) {
                 Text(text = "Login")
             }
-
+/*
             Text(
                 text = stringResource(id = R.string.forget_pws),
                 modifier = Modifier
@@ -173,7 +173,7 @@ fun LoginUi(
                 color = MaterialTheme.colors.primary,
                 textAlign = TextAlign.End,
                 fontSize = 12.sp
-            )
+            )*/
 
             if (error.value.isNotEmpty()) {
                 Text(

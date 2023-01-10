@@ -98,7 +98,7 @@
     <string name="electric_info">वीज माहिती</string>
     <string name="development_info">विकास कामांची माहिती</string>
     <string name="ration_info">रेशन दुकानाची माहिती</string>
-    <string name="drinking_water_info">ण्याच्या पाण्याची माहिती</string>
+    <string name="drinking_water_info">पिण्याच्या पाण्याची माहिती</string>
     <string name="death_person_info">मृत व्यक्तीची माहिती</string>
     <string name="water_canal_info">पाटपाणी माहिती</string>
     <string name="school_info">शाळा माहिती</string>
@@ -123,5 +123,5 @@
     <string name="ok">Ok</string>
     <string name="permission_error">Location permission required to use this application</string>
 
-
+    <string name="msg_list">Messages</string>
 </resources>

@@ -149,7 +149,14 @@ fun DrawerView(navigator: NavHostController?,route :String) {
             }, isSelected = route == Screens.YojnaList.route)
 
             DrawerItems(name = "वेळापत्रक", callback = {  current.toast("Coming  soon..") }, isSelected = route == Screens.AddComment.route)
-            DrawerItems(name = "संदेश", callback = {  current.toast("Coming  soon..") }, isSelected = route == Screens.AddComment.route)
+
+            DrawerItems(name = "संदेश", callback = {
+                navigator?.navigate(Screens.MessageList.route) {
+                    popUpTo(0)
+                }
+            },
+                isSelected = route == Screens.MessageList.route
+            )
 
         }
     }

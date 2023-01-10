@@ -113,6 +113,10 @@ fun showYojnaList(model: YojnaViewModel, yojnaList: ArrayList<YojnaModel>) {
     val selectedVillage: Village? = null
     var ganName by remember { mutableStateOf(selectedVillage?.gan ?: "") }
     var villageName by remember { mutableStateOf(selectedVillage) }
+    if (Cache.villageData == null || Cache.villageData!!.villages.isEmpty()) {
+        LocalContext.current.toast("No Village found")
+        return
+    }
     val list = Cache.villageData!!.villages.groupBy { it.gan }
     val gatList = list.keys
     val current = LocalContext.current
