@@ -181,6 +181,17 @@ fun DailyVisit(navigatorController: NavHostController?) {
                     }
 
                 }
+                is DailyVisitStateList.Failed->{
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = targetState.msg,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
 
                 else -> {
                     Box(
@@ -233,6 +244,14 @@ fun ShowDailyItem(
     dailyVisitModel: DailyVisitModel,
     navigatorController: NavHostController?,
 ) {
+    if (dailyVisitModel.villagename.isNullOrEmpty()) {
+        dailyVisitModel.villagename  = if(Cache.villageMap[dailyVisitModel.villageid]!=null){
+            Cache.villageMap[dailyVisitModel.villageid]!!.village
+        }else{
+            ""
+        }
+    }
+
     Card(
         modifier = Modifier
             .padding(10.dp)
@@ -260,8 +279,7 @@ fun ShowDailyItem(
             if (dailyVisitModel.villagename!=null && dailyVisitModel.villagename.isNotEmpty()) {
                 Text(
                     text = "Village Name/गावाचे नाव : ${dailyVisitModel.villagename}",
-                    fontSize = 12.sp,
-                    color = FontColor2
+                    fontSize = 14.sp
                 )
             }
 

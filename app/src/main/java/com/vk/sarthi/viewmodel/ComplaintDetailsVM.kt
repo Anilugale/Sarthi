@@ -2,11 +2,13 @@ package com.vk.sarthi.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vk.sarthi.WifiService
 import com.vk.sarthi.cache.Cache
 import com.vk.sarthi.model.Comment
 import com.vk.sarthi.model.ComplaintModel
 import com.vk.sarthi.model.DeleteCommentModel
 import com.vk.sarthi.service.Service
+import com.vk.sarthi.utli.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,26 +34,30 @@ class ComplaintDetailsVM @Inject constructor(val service: Service) : ViewModel()
     }
 
     fun deleteComment(comment: ComplaintModel?, commentID: Int) {
-        viewModelScope.launch {
-            val deleteComment =
-                service.deleteComment(DeleteCommentModel(commentID, Cache.loginUser!!.id))
-            delay(1000)
+        if (WifiService.instance.isOnline()) {
+            viewModelScope.launch {
+                val deleteComment =
+                    service.deleteComment(DeleteCommentModel(commentID, Cache.loginUser!!.id))
+                delay(1000)
 
-            if (deleteComment.isSuccessful) {
-                for (it in comment?.comments!!) {
-                    if (it.comment_id == commentID) {
-                        comment.comments.remove(it)
-                        break
+                if (deleteComment.isSuccessful) {
+                    for (it in comment?.comments!!) {
+                        if (it.comment_id == commentID) {
+                            comment.comments.remove(it)
+                            break
+                        }
                     }
+                    state.value = DetailsState.SuccessDelete(
+                        deleteComment.body()!!.messages, comment.comments
+                    )
+
+                } else {
+                    state.value = DetailsState.FailedDelete(deleteComment.body()!!.messages)
+
                 }
-                state.value = DetailsState.SuccessDelete(
-                    deleteComment.body()!!.messages, comment.comments
-                )
-
-            } else {
-                state.value = DetailsState.FailedDelete(deleteComment.body()!!.messages)
-
             }
+        }else{
+            state.value = DetailsState.FailedDelete(Constants.NO_INTERNET)
         }
 
     }

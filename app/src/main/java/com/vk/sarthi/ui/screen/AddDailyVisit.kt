@@ -86,7 +86,9 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
             }
         }
 
-
+        is DailyVisitState.Failed->{
+            current.toast((collectAsState.value as DailyVisitState.Failed).msg)
+        }
         else -> {
 
         }
@@ -266,6 +268,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
         Column(
             modifier = Modifier
                 .padding(start = 10.dp, end = 10.dp)
+                .padding(it)
                 .verticalScroll(rememberScrollState())
         ) {
             var selectedVillage: Village? = null

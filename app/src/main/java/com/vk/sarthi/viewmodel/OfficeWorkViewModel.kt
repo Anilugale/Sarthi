@@ -2,6 +2,7 @@ package com.vk.sarthi.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vk.sarthi.WifiService
 import com.vk.sarthi.cache.Cache
 import com.vk.sarthi.model.*
 import com.vk.sarthi.service.Service
@@ -23,27 +24,31 @@ class OfficeWorkViewModel @Inject constructor(private val service: Service) : Vi
     fun getList() {
         if (Cache.officeWorkModelList.isEmpty()) {
             viewModelScope.launch {
-                state.value = Status.Process
-                val response = service.getOfficeWorkList(ComplaintReq(Cache.loginUser!!.id))
+                if (WifiService.instance.isOnline()) {
+                    state.value = Status.Process
+                    val response = service.getOfficeWorkList(ComplaintReq(Cache.loginUser!!.id))
 
-                viewModelScope.launch(Dispatchers.Main) {
-                    if (response.isSuccessful && response.body() != null) {
-                        Cache.officeWorkModelList.addAll(response.body()!!.data)
-                        if (Cache.officeWorkModelList.isEmpty()) {
-                            state.value = Status.Empty
+                    viewModelScope.launch(Dispatchers.Main) {
+                        if (response.isSuccessful && response.body() != null) {
+                            Cache.officeWorkModelList.addAll(response.body()!!.data)
+                            if (Cache.officeWorkModelList.isEmpty()) {
+                                state.value = Status.Empty
+                            } else {
+                                Cache.officeWorkModelList.reverse()
+                                state.value = Status.SuccessOffice(Cache.officeWorkModelList, false)
+                            }
+
                         } else {
-                            Cache.officeWorkModelList.reverse()
-                            state.value = Status.SuccessOffice(Cache.officeWorkModelList, false)
+                            if (response.body() != null) {
+                                state.value = Status.Error(response.body()!!.messages)
+                            } else {
+                                state.value = Status.Error(Constants.Error)
+                            }
                         }
 
-                    } else {
-                        if (response.body() != null) {
-                            state.value = Status.Error(response.body()!!.messages)
-                        } else {
-                            state.value = Status.Error(Constants.Error)
-                        }
                     }
-
+                }else{
+                    state.value = Status.Error(Constants.NO_INTERNET)
                 }
             }
         } else {
@@ -56,27 +61,31 @@ class OfficeWorkViewModel @Inject constructor(private val service: Service) : Vi
 
     fun deleteWork(list: ArrayList<OfficeWorkModel>, commentID: Int) {
         viewModelScope.launch {
-            state.value = Status.ProcessHeader(true)
-            val deleteComment =
-                service.deleteOfficeWork(DeleteOfficeWorkModel(commentID, Cache.loginUser!!.id))
-            state.value = Status.ProcessHeader(true)
-            if (deleteComment.isSuccessful) {
-                for (it in list) {
-                    if (it.id == commentID) {
-                        list.remove(it)
-                        break
+            if (WifiService.instance.isOnline()) {
+                state.value = Status.ProcessHeader(true)
+                val deleteComment =
+                    service.deleteOfficeWork(DeleteOfficeWorkModel(commentID, Cache.loginUser!!.id))
+                state.value = Status.ProcessHeader(true)
+                if (deleteComment.isSuccessful) {
+                    for (it in list) {
+                        if (it.id == commentID) {
+                            list.remove(it)
+                            break
+                        }
                     }
+
+                    state.value = Status.SuccessDelete(
+                        deleteComment.body()!!.messages, list
+                    )
+
+                } else {
+                    state.value = Status.FailedDelete(deleteComment.body()!!.messages)
+
                 }
 
-                state.value = Status.SuccessDelete(
-                    deleteComment.body()!!.messages, list
-                )
-
-            } else {
-                state.value = Status.FailedDelete(deleteComment.body()!!.messages)
-
+            }else {
+                state.value = Status.FailedDelete(Constants.NO_INTERNET)
             }
-
         }
 
     }

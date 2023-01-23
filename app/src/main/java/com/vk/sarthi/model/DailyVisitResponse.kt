@@ -53,7 +53,7 @@ data class DailyVisitModel(
     val drinkingwaterinfofile: String,
     val electricityinfofile: String,
     val rashanshopinfofile: String,
-    val villagename: String = "",
+    var villagename: String = "",
 
 
-)
+    )

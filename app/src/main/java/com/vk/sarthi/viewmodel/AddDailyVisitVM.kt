@@ -2,8 +2,11 @@ package com.vk.sarthi.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vk.sarthi.WifiService
 import com.vk.sarthi.cache.Cache
 import com.vk.sarthi.service.Service
+import com.vk.sarthi.ui.screen.WorkState
+import com.vk.sarthi.utli.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,39 +41,43 @@ class AddDailyVisitVM @Inject constructor(val service: Service) : ViewModel() {
         devinfofileBody: MultipartBody.Part?,
         otherInfoFileBody: MultipartBody.Part?
     ) {
-        state.value = DailyVisitState.Process
-        viewModelScope.launch {
-            val response = service.createDailyVisit(
-                model, birthdayFileBody,
-                rashanshopinfoBody,
-                electricInfoFileBody,
-                drinkingwaterinfofileBody,
-                watercanelinfofileBody,
-                schoolinfofileBody,
-                primaryHealthInfoFileBody,
-                vetarnityHealthInfoFileBody,
-                govInfoInfoFileBody,
-                politicalInfoFileBody,
-                deathPersonInfoFileBody,
-                newschemesfileBody,
-                devinfofileBody,
-                otherInfoFileBody
-            )
-            viewModelScope.launch(Dispatchers.Main) {
-                if (response.isSuccessful) {
-                    if (response.body() != null) {
-                        if (visitid != 0) {
-                            Cache.dailyVisitList.removeIf { it.id == visitid }
+        if (WifiService.instance.isOnline()) {
+            state.value = DailyVisitState.Process
+            viewModelScope.launch {
+                val response = service.createDailyVisit(
+                    model, birthdayFileBody,
+                    rashanshopinfoBody,
+                    electricInfoFileBody,
+                    drinkingwaterinfofileBody,
+                    watercanelinfofileBody,
+                    schoolinfofileBody,
+                    primaryHealthInfoFileBody,
+                    vetarnityHealthInfoFileBody,
+                    govInfoInfoFileBody,
+                    politicalInfoFileBody,
+                    deathPersonInfoFileBody,
+                    newschemesfileBody,
+                    devinfofileBody,
+                    otherInfoFileBody
+                )
+                viewModelScope.launch(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        if (response.body() != null) {
+                            if (visitid != 0) {
+                                Cache.dailyVisitList.removeIf { it.id == visitid }
+                            }
+                            Cache.dailyVisitList.add(response.body()!!.data)
+                            state.value = DailyVisitState.Success(response.body()!!.messages)
+                        } else {
+                            state.value = DailyVisitState.Failed(response.message())
                         }
-                        Cache.dailyVisitList.add(response.body()!!.data)
-                        state.value = DailyVisitState.Success(response.body()!!.messages)
                     } else {
-                        state.value = DailyVisitState.Failed
+                        state.value = DailyVisitState.Failed(Constants.Error)
                     }
-                } else {
-                    state.value = DailyVisitState.Failed
                 }
             }
+        }else{
+            state.value = DailyVisitState.Failed(Constants.NO_INTERNET)
         }
     }
 }
@@ -79,5 +86,5 @@ sealed class DailyVisitState {
     class Success(val msg: String) : DailyVisitState()
     object Process : DailyVisitState()
     object Empty : DailyVisitState()
-    object Failed : DailyVisitState()
+    class Failed(val msg:String) : DailyVisitState()
 }

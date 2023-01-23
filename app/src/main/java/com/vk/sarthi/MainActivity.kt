@@ -30,7 +30,9 @@ import com.vk.sarthi.ui.nav.ShowNavGraph
 import com.vk.sarthi.ui.theme.SarthiTheme
 import com.vk.sarthi.utli.Constants
 import com.vk.sarthi.utli.SettingPreferences
+import com.vk.sarthi.utli.toast
 import dagger.hilt.android.AndroidEntryPoint
+import java.lang.ref.WeakReference
 
 
 @AndroidEntryPoint
@@ -38,7 +40,15 @@ class MainActivity : ComponentActivity() {
 
     companion object{
         const val TAG = "MainActivity"
+        @JvmStatic
+        var intance : WeakReference<ComponentActivity> = WeakReference<ComponentActivity>(null)
+        fun showError(){
+            intance.get()?.apply {
+                toast("No Internet Connection")
+            }
+        }
     }
+
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var isShowComplaint = false
     private var isMsg = false
@@ -55,7 +65,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "intent: $intent")
-
+        intance = WeakReference(this)
         if (intent.extras != null) {
             Log.d(TAG, "onCreate: ${intent.extras!!.getBoolean("FromNotification",false)}")
             isShowComplaint = true

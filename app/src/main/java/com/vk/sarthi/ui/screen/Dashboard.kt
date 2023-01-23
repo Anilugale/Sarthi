@@ -92,17 +92,17 @@ fun Dashboard(
 
         when (value) {
             VillageState.Empty -> {
-                Box(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = Modifier.fillMaxSize().padding(it)) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
             }
             is VillageState.Failed -> {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    Text(text = "No data Found", Modifier.align(Alignment.Center))
+                Box(modifier = Modifier.fillMaxSize().padding(it)) {
+                    Text(text = value.msg, Modifier.align(Alignment.Center))
                 }
             }
             VillageState.Success -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Box(modifier = Modifier.fillMaxSize().padding(it), contentAlignment = Alignment.Center) {
                     if (Cache.villageData != null) {
                         LazyColumn(
                             modifier = Modifier
@@ -170,6 +170,7 @@ fun ShowVillageItem(it: Village) {
     var isShowDetailsDialog by remember {
         mutableStateOf(false)
     }
+    Cache.villageMap[it.id] = it
     Card(
         modifier = Modifier
             .padding(10.dp)

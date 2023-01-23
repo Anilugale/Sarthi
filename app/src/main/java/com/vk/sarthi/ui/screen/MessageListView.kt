@@ -17,6 +17,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -71,7 +72,12 @@ fun MessageListView(navigator: NavHostController) {
 
         when (val uiState = rememberVm.stateExpose.collectAsState().value) {
             MsgListStatus.Empty -> {
-
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = "No data Found",
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
 
             MsgListStatus.Progress -> {
@@ -81,6 +87,14 @@ fun MessageListView(navigator: NavHostController) {
             }
             is MsgListStatus.SuccessMsgList -> {
                 ShowMessageList(uiState.msgList.reversed(), it)
+            }
+            is MsgListStatus.Error->{
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = uiState.msg,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
 
             else -> {}
@@ -124,7 +138,7 @@ fun ShowMessageList(msgList: List<MessageModel>, paddingValues: PaddingValues) {
                                 modifier = Modifier.align(CenterVertically)
                             )
                             Text(
-                                text = "Admin", fontSize = 14.sp,
+                                text = admin_name?:"Admin", fontSize = 14.sp,
                                 modifier = Modifier
                                     .padding(10.dp)
                                     .align(CenterVertically)
@@ -196,13 +210,13 @@ fun ShowMessageDialog(msg: MessageModel?, function: () -> Unit) {
                 ) {
                     Row {
                         Text(
-                            text = "To:",
+                            text = "From:",
                             color = color,
                             fontSize = 14.sp,
                             modifier = Modifier.align(CenterVertically)
                         )
                         Text(
-                            text = "Admin", color = color, fontSize = 14.sp,
+                            text = msg.admin_name?:"Admin", color = color, fontSize = 14.sp,
                             modifier = Modifier
                                 .padding(10.dp)
                                 .align(CenterVertically)

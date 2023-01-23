@@ -12,4 +12,5 @@ data class MessageModel(
     val createddate: String,
     val id: Int,
     val message: String,
+    val admin_name:String
 )

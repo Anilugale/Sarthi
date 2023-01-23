@@ -42,12 +42,14 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.vk.sarthi.R
+import com.vk.sarthi.WifiService
 import com.vk.sarthi.cache.Cache
 import com.vk.sarthi.model.*
 import com.vk.sarthi.ui.nav.BottomNavigationBar
 import com.vk.sarthi.ui.nav.Screens
 import com.vk.sarthi.service.Service
 import com.vk.sarthi.ui.theme.*
+import com.vk.sarthi.utli.Constants
 import com.vk.sarthi.viewmodel.MainViewModel
 import com.vk.sarthi.viewmodel.Status
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -127,6 +129,14 @@ fun ComplaintListUI(navigatorController: NavHostController?) {
                         }
                     }
 
+                }
+                is Status.Error->{
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(
+                            text = targetState.error,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
 
                 else -> {
@@ -336,42 +346,46 @@ class ComplaintViewModel @Inject constructor(private val service: Service) : Vie
     }
 
     fun getData(force: Boolean = false) = viewModelScope.launch {
+        if (WifiService.instance.isOnline()) {
         if (Cache.commentList.isEmpty() || force) {
 
-            state.value = Status.Process
-            viewModelScope.launch(Dispatchers.IO) {
-                val commentList = service.getComplaintList(ComplaintReq(Cache.loginUser!!.id))
+                state.value = Status.Process
+                viewModelScope.launch(Dispatchers.IO) {
+                    val commentList = service.getComplaintList(ComplaintReq(Cache.loginUser!!.id))
 
-                viewModelScope.launch(Dispatchers.Main) {
-                    try {
-                        if (commentList.body() != null) {
-                            if (force) {
-                                Cache.commentList.clear()
-                                postList.clear()
-                            }
+                    viewModelScope.launch(Dispatchers.Main) {
+                        try {
+                            if (commentList.body() != null) {
+                                if (force) {
+                                    Cache.commentList.clear()
+                                    postList.clear()
+                                }
 
-                            Cache.commentList.addAll(commentList.body()!!.data)
-                            postList.addAll(Cache.commentList)
-                            if (postList.isEmpty()) {
-                                state.value = Status.Empty
+                                Cache.commentList.addAll(commentList.body()!!.data)
+                                postList.addAll(Cache.commentList)
+                                if (postList.isEmpty()) {
+                                    state.value = Status.Empty
+                                } else {
+                                    state.value = Status.Success(postList, isFooterShow)
+                                }
                             } else {
-                                state.value = Status.Success(postList, isFooterShow)
+                                state.value = Status.Error(commentList.message())
+
                             }
-                        } else {
-                            state.value = Status.Error(commentList.message())
 
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            state.value = e.message?.let { Status.Error(it) }!!
                         }
-
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        state.value = e.message?.let { Status.Error(it) }!!
                     }
                 }
+            }else{
+            postList.addAll(Cache.commentList)
+            state.value = Status.Success(postList, isFooterShow)
             }
 
         } else {
-            postList.addAll(Cache.commentList)
-            state.value = Status.Success(postList, isFooterShow)
+            Status.Error(Constants.NO_INTERNET)
         }
     }
 

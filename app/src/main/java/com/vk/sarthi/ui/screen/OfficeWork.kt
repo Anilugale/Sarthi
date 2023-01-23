@@ -149,6 +149,16 @@ fun ShowOfficeListUI(
             isProgressShow.value = targetState.isShow
         }
 
+        is Status.Error->{
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(
+                    text = targetState.error,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+
+
         is Status.SuccessOffice -> {
             ShowListOffice(targetState.list, navigatorController, listState, model)
         }

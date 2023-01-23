@@ -120,10 +120,9 @@ fun showYojnaList(model: YojnaViewModel, yojnaList: ArrayList<YojnaModel>) {
     val list = Cache.villageData!!.villages.groupBy { it.gan }
     val gatList = list.keys
     val current = LocalContext.current
-    val swipeRefreshState = rememberSwipeRefreshState(false)
     val selectedList = mutableStateListOf<Int>()
-    Column(modifier = Modifier.fillMaxSize()) {
-            LazyColumn {
+    Box(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(modifier = Modifier.fillMaxSize().padding(bottom = 50.dp)) {
                 item(key = "header") {
                     DropDownSpinner(
                         modifier = Modifier.padding(10.dp),
@@ -196,29 +195,28 @@ fun showYojnaList(model: YojnaViewModel, yojnaList: ArrayList<YojnaModel>) {
                     }
                 }
 
-                item {
-                    Button(
-                        onClick = {
-                            if (selectedList.isNotEmpty()) {
-                                Log.d("@@", "showYojnaList: ${selectedList.toList()}")
-                                val req = YojsnaPostReq(coordinatorid = Cache.loginUser!!.id,
-                                    village_id = villageName!!.id.toString(),
-                                    yojana = selectedList.toList()
-                                )
-                                model.sendYojna(req)
-                            }else{
-                                current.toast("किमान एक योजना निवडा!")
-                            }
 
-                        },
-                        modifier = Modifier
-                            .padding(vertical = 5.dp, horizontal = 10.dp)
-                            .fillMaxWidth()
-                    ) {
-                        Text(text = "Submit")
-                    }
-                }
             }
+        Button(
+            onClick = {
+                if (selectedList.isNotEmpty()) {
+                    Log.d("@@", "showYojnaList: ${selectedList.toList()}")
+                    val req = YojsnaPostReq(coordinatorid = Cache.loginUser!!.id,
+                        village_id = villageName!!.id.toString(),
+                        yojana = selectedList.toList()
+                    )
+                    model.sendYojna(req)
+                }else{
+                    current.toast("किमान एक योजना निवडा!")
+                }
 
+            },
+            modifier = Modifier
+                .padding(vertical = 5.dp, horizontal = 10.dp)
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+        ) {
+            Text(text = "Submit")
+        }
     }
 }

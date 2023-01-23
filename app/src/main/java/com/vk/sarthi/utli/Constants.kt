@@ -3,6 +3,7 @@ package com.vk.sarthi.utli
 object Constants {
 
     const val Error: String = "Server Error"
+    const val NO_INTERNET: String = "No Internet Connection"
     const val comment_url = "/comments"
     const val loginUrl = "api/coordinatorlogin"
     const val forgotpassword = "api/forgotpassword"

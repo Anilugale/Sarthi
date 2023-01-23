@@ -24,6 +24,7 @@ object Cache {
 
 
     val dailyVisitList = arrayListOf<DailyVisitModel>()
+    var villageMap = HashMap<Int,Village>()
 
     fun getDailyVisitModel(id: Int):DailyVisitModel? {
         return try {
