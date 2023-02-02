@@ -3,6 +3,8 @@ package com.vk.sarthi.ui.screen
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -16,6 +18,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.AddCircle
+import androidx.compose.material.icons.outlined.Attachment
 import androidx.compose.material.icons.outlined.RemoveCircle
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -29,9 +32,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.gson.Gson
+import com.vk.sarthi.BuildConfig
 import com.vk.sarthi.R
 import com.vk.sarthi.cache.Cache
 import com.vk.sarthi.model.DailyVisitModel
@@ -51,6 +56,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.*
 import java.util.*
+
 
 @Composable
 fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
@@ -348,16 +354,31 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 modifier = Modifier.fillMaxWidth()
             )
 
-            if (developmentInfo.value.isNotEmpty()) {
-                Button(onClick = {
-                    val newPhotoUri = current.createImageFile().getUriForFile(current)
-                    currentFile = newPhotoUri
-                    SelectionFileType = Constants.DEV_INFO
-                    cameraLauncher.launch(newPhotoUri)
-                }) {
-                    Text(text = stringResource(R.string.development_info) + " photo")
+            Row {
+                if (developmentInfo.value.isNotEmpty()) {
+                    Button(onClick = {
+                        val newPhotoUri = current.createImageFile().getUriForFile(current)
+                        currentFile = newPhotoUri
+                        SelectionFileType = Constants.DEV_INFO
+                        cameraLauncher.launch(newPhotoUri)
+                    }) {
+                        Text(text = stringResource(R.string.development_info) + " photo")
+                    }
+                }
+                if(devFile!=null) {
+                    Icon(Icons.Outlined.Attachment,
+                        contentDescription = "",
+                        tint = labelColor,
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .padding(10.dp)
+                            .clickable {
+                                showImage(devFile!!, current)
+                            }
+                    )
                 }
             }
+
 
 
 
@@ -368,15 +389,28 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 label = { Text(text = stringResource(R.string.ration_info)) },
                 modifier = Modifier.fillMaxWidth()
             )
-
-            if (rationShopInfo.value.isNotEmpty()) {
-                Button(onClick = {
-                    val newPhotoUri = current.createImageFile().getUriForFile(current)
-                    currentFile = newPhotoUri
-                    SelectionFileType = Constants.RASATION_INFO
-                    cameraLauncher.launch(newPhotoUri)
-                }) {
-                    Text(text = stringResource(R.string.ration_info) + " photo")
+            Row {
+                if (rationShopInfo.value.isNotEmpty()) {
+                    Button(onClick = {
+                        val newPhotoUri = current.createImageFile().getUriForFile(current)
+                        currentFile = newPhotoUri
+                        SelectionFileType = Constants.RASATION_INFO
+                        cameraLauncher.launch(newPhotoUri)
+                    }) {
+                        Text(text = stringResource(R.string.ration_info) + " photo")
+                    }
+                }
+                if (rationInfoFile != null) {
+                    Icon(Icons.Outlined.Attachment,
+                        contentDescription = "",
+                        tint = labelColor,
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .padding(10.dp)
+                            .clickable {
+                                showImage(rationInfoFile!!, current)
+                            }
+                    )
                 }
             }
             OutlinedTextField(
@@ -385,6 +419,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 label = { Text(text = stringResource(R.string.electric_info)) },
                 modifier = Modifier.fillMaxWidth()
             )
+            Row {
             if (electricInfo.value.isNotEmpty()) {
                 Button(onClick = {
                     val newPhotoUri = current.createImageFile().getUriForFile(current)
@@ -396,6 +431,19 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
                 }
             }
+            if (electricInfoFile != null) {
+                Icon(Icons.Outlined.Attachment,
+                    contentDescription = "",
+                    tint = labelColor,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(10.dp)
+                        .clickable {
+                            showImage(electricInfoFile!!, current)
+                        }
+                )
+            }
+        }
 
             OutlinedTextField(
                 value = drinkingWaterInfo.value,
@@ -403,7 +451,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 label = { Text(text = stringResource(R.string.drinking_water_info)) },
                 modifier = Modifier.fillMaxWidth()
             )
-
+            Row {
             if (drinkingWaterInfo.value.isNotEmpty()) {
                 Button(onClick = {
                     val newPhotoUri = current.createImageFile().getUriForFile(current)
@@ -415,6 +463,19 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
                 }
             }
+            if (drinkingInfoFile != null) {
+                Icon(Icons.Outlined.Attachment,
+                    contentDescription = "",
+                    tint = labelColor,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(10.dp)
+                        .clickable {
+                            showImage(drinkingInfoFile!!, current)
+                        }
+                )
+            }
+        }
 
 
 
@@ -424,7 +485,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 label = { Text(text = stringResource(R.string.water_canal_info)) },
                 modifier = Modifier.fillMaxWidth()
             )
-
+            Row {
             if (waterCanalInfo.value.isNotEmpty()) {
                 Button(onClick = {
                     val newPhotoUri = current.createImageFile().getUriForFile(current)
@@ -436,7 +497,19 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
                 }
             }
-
+                if (waterCanalInfoFile != null) {
+                    Icon(Icons.Outlined.Attachment,
+                        contentDescription = "",
+                        tint = labelColor,
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .padding(10.dp)
+                            .clickable {
+                                showImage(waterCanalInfoFile!!, current)
+                            }
+                    )
+                }
+            }
 
 
             OutlinedTextField(
@@ -445,7 +518,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 label = { Text(text = stringResource(R.string.school_info)) },
                 modifier = Modifier.fillMaxWidth()
             )
-
+            Row {
             if (schoolInfo.value.isNotEmpty()) {
                 Button(onClick = {
                     val newPhotoUri = current.createImageFile().getUriForFile(current)
@@ -457,6 +530,19 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
                 }
             }
+            if (schoolInfoFile != null) {
+                Icon(Icons.Outlined.Attachment,
+                    contentDescription = "",
+                    tint = labelColor,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(10.dp)
+                        .clickable {
+                            showImage(schoolInfoFile!!, current)
+                        }
+                )
+            }
+        }
 
             OutlinedTextField(
                 value = prathamikInfo.value,
@@ -464,7 +550,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 label = { Text(text = stringResource(R.string.prathamik_info)) },
                 modifier = Modifier.fillMaxWidth()
             )
-
+            Row {
             if (prathamikInfo.value.isNotEmpty()) {
                 Button(onClick = {
                     val newPhotoUri = current.createImageFile().getUriForFile(current)
@@ -475,14 +561,26 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     Text(text = stringResource(R.string.prathamik_info) + " photo")
                 }
             }
-
+            if (primaryHealthInfoFile != null) {
+                Icon(Icons.Outlined.Attachment,
+                    contentDescription = "",
+                    tint = labelColor,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(10.dp)
+                        .clickable {
+                            showImage(primaryHealthInfoFile!!, current)
+                        }
+                )
+            }
+        }
             OutlinedTextField(
                 value = pashuInfo.value,
                 onValueChange = { pashuInfo.value = it },
                 label = { Text(text = stringResource(R.string.pashu_info)) },
                 modifier = Modifier.fillMaxWidth()
             )
-
+            Row {
             if (pashuInfo.value.isNotEmpty()) {
                 Button(onClick = {
                     val newPhotoUri = current.createImageFile().getUriForFile(current)
@@ -493,6 +591,19 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     Text(text = stringResource(R.string.pashu_info) + " Photo")
                 }
             }
+            if (vetarnityHealthInfoFile != null) {
+                Icon(Icons.Outlined.Attachment,
+                    contentDescription = "",
+                    tint = labelColor,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(10.dp)
+                        .clickable {
+                            showImage(vetarnityHealthInfoFile!!, current)
+                        }
+                )
+            }
+        }
 
             OutlinedTextField(
                 value = govEmpInfo.value,
@@ -500,7 +611,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 label = { Text(text = stringResource(R.string.gov_emp_info)) },
                 modifier = Modifier.fillMaxWidth()
             )
-
+            Row {
             if (govEmpInfo.value.isNotEmpty()) {
                 Button(onClick = {
                     val newPhotoUri = current.createImageFile().getUriForFile(current)
@@ -511,6 +622,19 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     Text(text = stringResource(R.string.gov_emp_info) + " Photo")
                 }
             }
+            if (govInfoInfoFile != null) {
+                Icon(Icons.Outlined.Attachment,
+                    contentDescription = "",
+                    tint = labelColor,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(10.dp)
+                        .clickable {
+                            showImage(govInfoInfoFile!!, current)
+                        }
+                )
+            }
+        }
 
             OutlinedTextField(
                 value = politicsInfo.value,
@@ -519,33 +643,59 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 modifier = Modifier.fillMaxWidth()
             )
 
-
-            if (politicsInfo.value.isNotEmpty()) {
-                Button(onClick = {
-                    val newPhotoUri = current.createImageFile().getUriForFile(current)
-                    currentFile = newPhotoUri
-                    SelectionFileType = Constants.POLITICAL_INFO
-                    cameraLauncher.launch(newPhotoUri)
-                }) {
-                    Text(text = stringResource(R.string.gov_emp_info) + " Photo")
+            Row {
+                if (politicsInfo.value.isNotEmpty()) {
+                    Button(onClick = {
+                        val newPhotoUri = current.createImageFile().getUriForFile(current)
+                        currentFile = newPhotoUri
+                        SelectionFileType = Constants.POLITICAL_INFO
+                        cameraLauncher.launch(newPhotoUri)
+                    }) {
+                        Text(text = stringResource(R.string.gov_emp_info) + " Photo")
+                    }
+                }
+                if (politicalInfoFile != null) {
+                    Icon(Icons.Outlined.Attachment,
+                        contentDescription = "",
+                        tint = labelColor,
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .padding(10.dp)
+                            .clickable {
+                                showImage(politicalInfoFile!!, current)
+                            }
+                    )
                 }
             }
+            Row {
+                OutlinedTextField(
+                    value = deathPersonInfo.value,
+                    onValueChange = { deathPersonInfo.value = it },
+                    label = { Text(text = stringResource(R.string.death_person_info)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            OutlinedTextField(
-                value = deathPersonInfo.value,
-                onValueChange = { deathPersonInfo.value = it },
-                label = { Text(text = stringResource(R.string.death_person_info)) },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            if (deathPersonInfo.value.isNotEmpty()) {
-                Button(onClick = {
-                    val newPhotoUri = current.createImageFile().getUriForFile(current)
-                    currentFile = newPhotoUri
-                    SelectionFileType = Constants.DEATH_PERSON_INFO
-                    cameraLauncher.launch(newPhotoUri)
-                }) {
-                    Text(text = stringResource(R.string.death_person_info) + " Photo")
+                if (deathPersonInfo.value.isNotEmpty()) {
+                    Button(onClick = {
+                        val newPhotoUri = current.createImageFile().getUriForFile(current)
+                        currentFile = newPhotoUri
+                        SelectionFileType = Constants.DEATH_PERSON_INFO
+                        cameraLauncher.launch(newPhotoUri)
+                    }) {
+                        Text(text = stringResource(R.string.death_person_info) + " Photo")
+                    }
+                }
+                if (deathPersonInfoFile != null) {
+                    Icon(Icons.Outlined.Attachment,
+                        contentDescription = "",
+                        tint = labelColor,
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .padding(10.dp)
+                            .clickable {
+                                showImage(deathPersonInfoFile!!, current)
+                            }
+                    )
                 }
             }
 
@@ -555,15 +705,28 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 label = { Text(text = stringResource(R.string.birthday_info)) },
                 modifier = Modifier.fillMaxWidth()
             )
-
-            if (birthdayInfo.value.isNotEmpty()) {
-                Button(onClick = {
-                    val newPhotoUri = current.createImageFile().getUriForFile(current)
-                    currentFile = newPhotoUri
-                    SelectionFileType = Constants.BIRTHDAY_INFO
-                    cameraLauncher.launch(newPhotoUri)
-                }) {
-                    Text(text = stringResource(R.string.birthday_info) + " Photo")
+            Row {
+                if (birthdayInfo.value.isNotEmpty()) {
+                    Button(onClick = {
+                        val newPhotoUri = current.createImageFile().getUriForFile(current)
+                        currentFile = newPhotoUri
+                        SelectionFileType = Constants.BIRTHDAY_INFO
+                        cameraLauncher.launch(newPhotoUri)
+                    }) {
+                        Text(text = stringResource(R.string.birthday_info) + " Photo")
+                    }
+                }
+                if (birthdayInfoFile != null) {
+                    Icon(Icons.Outlined.Attachment,
+                        contentDescription = "",
+                        tint = labelColor,
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .padding(10.dp)
+                            .clickable {
+                                showImage(birthdayInfoFile!!, current)
+                            }
+                    )
                 }
             }
 
@@ -573,15 +736,28 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 label = { Text(text = stringResource(R.string.gat_labh_yojna)) },
                 modifier = Modifier.fillMaxWidth()
             )
-
-            if (gatLabhYojna.value.isNotEmpty()) {
-                Button(onClick = {
-                    val newPhotoUri = current.createImageFile().getUriForFile(current)
-                    currentFile = newPhotoUri
-                    SelectionFileType = Constants.YOJNA_INFO_INFO
-                    cameraLauncher.launch(newPhotoUri)
-                }) {
-                    Text(text = stringResource(R.string.gat_labh_yojna) + " Photo")
+            Row {
+                if (gatLabhYojna.value.isNotEmpty()) {
+                    Button(onClick = {
+                        val newPhotoUri = current.createImageFile().getUriForFile(current)
+                        currentFile = newPhotoUri
+                        SelectionFileType = Constants.YOJNA_INFO_INFO
+                        cameraLauncher.launch(newPhotoUri)
+                    }) {
+                        Text(text = stringResource(R.string.gat_labh_yojna) + " Photo")
+                    }
+                }
+                if (yojnaInfoFile != null) {
+                    Icon(Icons.Outlined.Attachment,
+                        contentDescription = "",
+                        tint = labelColor,
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .padding(10.dp)
+                            .clickable {
+                                showImage(yojnaInfoFile!!, current)
+                            }
+                    )
                 }
             }
 
@@ -592,7 +768,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 modifier = Modifier.fillMaxWidth(),
 
                 )
-
+            Row {
             if (otherInfo.value.isNotEmpty()) {
                 Button(onClick = {
                     val newPhotoUri = current.createImageFile().getUriForFile(current)
@@ -603,6 +779,19 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     Text(text = stringResource(R.string.other_info) + " Photo")
                 }
             }
+            if (otherInfoFile != null) {
+                Icon(Icons.Outlined.Attachment,
+                    contentDescription = "",
+                    tint = labelColor,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(10.dp)
+                        .clickable {
+                            showImage(otherInfoFile!!, current)
+                        }
+                )
+            }
+        }
 
 
             Button(
@@ -924,6 +1113,17 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
     }
 
 
+}
+
+fun showImage(devFile: File, current: Context) {
+    val uriForFile =
+        FileProvider.getUriForFile(current, BuildConfig.APPLICATION_ID + ".fileprovider", devFile)
+
+    val intent = Intent(Intent.ACTION_VIEW)
+        .setDataAndType(uriForFile,
+            "image/*"
+        ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    current.startActivity(intent)
 }
 
 @Composable
