@@ -44,6 +44,7 @@ import com.vk.sarthi.model.OfficeWorkModel
 import com.vk.sarthi.ui.nav.BottomNavigationBar
 import com.vk.sarthi.ui.nav.Screens
 import com.vk.sarthi.ui.theme.*
+import com.vk.sarthi.utli.Util
 import com.vk.sarthi.viewmodel.OfficeWorkViewModel
 import com.vk.sarthi.viewmodel.Status
 import kotlinx.coroutines.CoroutineScope
@@ -69,9 +70,8 @@ fun OfficeWork(navigatorController: NavHostController?) {
     when (syncState) {
         is Status.ProcessDialog -> {
             showProgressDialog.value =  syncState.isShow
-            if (syncState.isShow == false) {
-
-            Cache.clearOfflineOfficeWork(current)
+            if (!syncState.isShow) {
+              Cache.clearOfflineOfficeWork(current)
             }
         }
         else->{
@@ -385,30 +385,32 @@ fun WorkDailyUI(
                 modalBottomSheetState?.hide()
             }
         }) {
-        Icon(
-            Icons.Outlined.MoreVert,
-            contentDescription = "",
-            tint = color,
-            modifier = Modifier
-                .height(40.dp)
-                .width(40.dp)
-                .padding(10.dp)
-                .fillMaxWidth(0.2f)
-                .align(Alignment.TopEnd)
-                .clickable {
-                    clickID.value = model.id.toString()
-                    coroutineScope.launch {
-                        if (modalBottomSheetState != null) {
-                            if (modalBottomSheetState.isVisible) {
-                                modalBottomSheetState.hide()
-                            } else {
-                                modalBottomSheetState.show()
+        if(Util.isTodayDateForOffice(model.createddate)) {
+            Icon(
+                Icons.Outlined.MoreVert,
+                contentDescription = "",
+                tint = color,
+                modifier = Modifier
+                    .height(40.dp)
+                    .width(40.dp)
+                    .padding(10.dp)
+                    .fillMaxWidth(0.2f)
+                    .align(Alignment.TopEnd)
+                    .clickable {
+                        clickID.value = model.id.toString()
+                        coroutineScope.launch {
+                            if (modalBottomSheetState != null) {
+                                if (modalBottomSheetState.isVisible) {
+                                    modalBottomSheetState.hide()
+                                } else {
+                                    modalBottomSheetState.show()
+                                }
                             }
-                        }
 
+                        }
                     }
-                }
-        )
+            )
+        }
         Column(
             modifier = Modifier
                 .fillMaxWidth()

@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -271,20 +272,21 @@ fun ShowDailyItem(
                 .padding(10.dp)
         ) {
 
+            if (dailyVisitModel.villagename!=null && dailyVisitModel.villagename.isNotEmpty()) {
+                Text(
+                    text = "गावाचे नाव : ${dailyVisitModel.villagename}",
+                    fontSize = 16.sp
+                )
+            }
+
             if (dailyVisitModel.persons_visited.isNotEmpty()) {
                 Text(
-                    text = "No of Persons visited :- " + dailyVisitModel.persons_visited.size,
+                    text = stringResource(R.string.person_visited)+" :- " + dailyVisitModel.persons_visited.size,
                     fontSize = 14.sp
                 )
                 Spacer(modifier = Modifier.height(5.dp))
             }
 
-            if (dailyVisitModel.villagename!=null && dailyVisitModel.villagename.isNotEmpty()) {
-                Text(
-                    text = "Village Name/गावाचे नाव : ${dailyVisitModel.villagename}",
-                    fontSize = 14.sp
-                )
-            }
 
 
             Spacer(modifier = Modifier.height(5.dp))

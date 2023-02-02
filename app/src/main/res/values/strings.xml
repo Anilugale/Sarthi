@@ -124,4 +124,5 @@
     <string name="permission_error">Location permission required to use this application</string>
 
     <string name="msg_list">Messages</string>
+    <string name="person_visited">व्यक्तींनी भेट दिली</string>
 </resources>

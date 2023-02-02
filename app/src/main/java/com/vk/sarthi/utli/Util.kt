@@ -9,6 +9,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.nio.channels.FileChannel
+import java.text.SimpleDateFormat
 import java.util.*
 
 object Util {
@@ -54,6 +55,24 @@ object Util {
             }, mYear, mMonth, mDay
         )
 
+    }
+
+    fun isTodayDate(dateStr: String): Boolean {
+        val date = Date()
+        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+        val strDate: String = formatter.format(date)
+        return dateStr == strDate
+    }
+
+    fun isTodayDateForOffice(dateStr: String): Boolean {
+        val date = Date()
+        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+        val strDate: String = formatter.format(date)
+        return  if (dateStr.contains(" ")) {
+             dateStr.split(" ")[0] == strDate
+        }else{
+             dateStr == strDate
+        }
     }
 }
 

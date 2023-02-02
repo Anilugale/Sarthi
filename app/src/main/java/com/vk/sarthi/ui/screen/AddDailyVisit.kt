@@ -80,13 +80,13 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
             }
 
         }
-        DailyVisitState.Process ->{
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+        DailyVisitState.Process -> {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         }
 
-        is DailyVisitState.Failed->{
+        is DailyVisitState.Failed -> {
             current.toast((collectAsState.value as DailyVisitState.Failed).msg)
         }
         else -> {
@@ -161,49 +161,49 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     Constants.DEV_INFO -> {
                         devFile = File(uri.path)
                     }
-                    Constants.RASATION_INFO->{
+                    Constants.RASATION_INFO -> {
                         rationInfoFile = File(uri.path)
                     }
-                    Constants.ELECTRIC_INFO->{
+                    Constants.ELECTRIC_INFO -> {
                         electricInfoFile = File(uri.path)
                     }
-                    Constants.DRINKING_WATER->{
+                    Constants.DRINKING_WATER -> {
                         drinkingInfoFile = File(uri.path)
                     }
-                    Constants.WATER_CANAL->{
+                    Constants.WATER_CANAL -> {
                         waterCanalInfoFile = File(uri.path)
                     }
 
-                    Constants.SCHOOL_INFO->{
+                    Constants.SCHOOL_INFO -> {
                         schoolInfoFile = File(uri.path)
                     }
 
-                    Constants.PRIMARAY_HELATH->{
+                    Constants.PRIMARAY_HELATH -> {
                         primaryHealthInfoFile = File(uri.path)
                     }
 
-                    Constants.VETARNARY_HEALTH->{
+                    Constants.VETARNARY_HEALTH -> {
                         vetarnityHealthInfoFile = File(uri.path)
                     }
-                    Constants.GOV_INFO->{
+                    Constants.GOV_INFO -> {
                         govInfoInfoFile = File(uri.path)
                     }
-                    Constants.POLITICAL_INFO->{
+                    Constants.POLITICAL_INFO -> {
                         politicalInfoFile = File(uri.path)
                     }
 
-                    Constants.DEATH_PERSON_INFO->{
+                    Constants.DEATH_PERSON_INFO -> {
                         deathPersonInfoFile = File(uri.path)
                     }
-                    Constants.BIRTHDAY_INFO->{
+                    Constants.BIRTHDAY_INFO -> {
                         birthdayInfoFile = File(uri.path)
                     }
 
-                    Constants.YOJNA_INFO_INFO->{
+                    Constants.YOJNA_INFO_INFO -> {
                         yojnaInfoFile = File(uri.path)
                     }
 
-                    Constants.OTHER_INFO->{
+                    Constants.OTHER_INFO -> {
                         otherInfoFile = File(uri.path)
                     }
                     else -> {}
@@ -291,7 +291,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     ganName = item
                     villageName = null
                 },
-                itemList =  gatList.toList()
+                itemList = gatList.toList()
             )
 
             DropDownSpinner(
@@ -310,7 +310,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
             Box(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = "व्यक्तींनी भेट दिली",
+                    text = stringResource(R.string.person_visited),
                     modifier = Modifier
                         .padding(10.dp)
                         .align(Alignment.CenterStart),
@@ -336,8 +336,8 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
             }
 
 
-            personVisitedList.forEach {
-                PersonVisitedUI(model = it, labelColor, personVisitedList, (dailyModel == null))
+            personVisitedList.forEach {model->
+                PersonVisitedUI(model = model, labelColor, personVisitedList, (dailyModel == null))
             }
 
 
@@ -355,7 +355,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.DEV_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.development_info)+" photo")
+                    Text(text = stringResource(R.string.development_info) + " photo")
                 }
             }
 
@@ -376,7 +376,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.RASATION_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.ration_info)+" photo")
+                    Text(text = stringResource(R.string.ration_info) + " photo")
                 }
             }
             OutlinedTextField(
@@ -392,7 +392,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.ELECTRIC_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.electric_info)+" photo")
+                    Text(text = stringResource(R.string.electric_info) + " photo")
 
                 }
             }
@@ -411,7 +411,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.DRINKING_WATER
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.drinking_water_info)+" photo")
+                    Text(text = stringResource(R.string.drinking_water_info) + " photo")
 
                 }
             }
@@ -432,7 +432,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.WATER_CANAL
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.water_canal_info)+" photo")
+                    Text(text = stringResource(R.string.water_canal_info) + " photo")
 
                 }
             }
@@ -453,7 +453,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.SCHOOL_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.school_info)+" photo")
+                    Text(text = stringResource(R.string.school_info) + " photo")
 
                 }
             }
@@ -472,7 +472,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.PRIMARAY_HELATH
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.prathamik_info)+" photo")
+                    Text(text = stringResource(R.string.prathamik_info) + " photo")
                 }
             }
 
@@ -490,7 +490,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.VETARNARY_HEALTH
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.pashu_info)+ " Photo")
+                    Text(text = stringResource(R.string.pashu_info) + " Photo")
                 }
             }
 
@@ -508,7 +508,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.GOV_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.gov_emp_info)+ " Photo")
+                    Text(text = stringResource(R.string.gov_emp_info) + " Photo")
                 }
             }
 
@@ -527,7 +527,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.POLITICAL_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.gov_emp_info)+ " Photo")
+                    Text(text = stringResource(R.string.gov_emp_info) + " Photo")
                 }
             }
 
@@ -545,7 +545,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.DEATH_PERSON_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.death_person_info)+ " Photo")
+                    Text(text = stringResource(R.string.death_person_info) + " Photo")
                 }
             }
 
@@ -563,7 +563,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.BIRTHDAY_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.birthday_info)+ " Photo")
+                    Text(text = stringResource(R.string.birthday_info) + " Photo")
                 }
             }
 
@@ -581,7 +581,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.YOJNA_INFO_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.gat_labh_yojna)+ " Photo")
+                    Text(text = stringResource(R.string.gat_labh_yojna) + " Photo")
                 }
             }
 
@@ -600,14 +600,14 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     SelectionFileType = Constants.OTHER_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.other_info)+ " Photo")
+                    Text(text = stringResource(R.string.other_info) + " Photo")
                 }
             }
 
 
             Button(
                 onClick = {
-                    if (ganName.isEmpty() ) {
+                    if (ganName.isEmpty()) {
                         Toast.makeText(current, "Select Village", Toast.LENGTH_SHORT).show()
                         return@Button
                     }
@@ -668,167 +668,248 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     var newschemesfileBody: MultipartBody.Part? = null
                     var devinfofileBody: MultipartBody.Part? = null
                     var otherInfoFileBody: MultipartBody.Part? = null
-                    map["coordinator_id"] = Cache.loginUser!!.id.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-                    map["villageid"] = villageName!!.id.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-                    map["persons_visited"] = Gson().toJson(personalList).toRequestBody("text/plain".toMediaTypeOrNull())
+                    map["coordinator_id"] = Cache.loginUser!!.id.toString()
+                        .toRequestBody("text/plain".toMediaTypeOrNull())
+                    map["villageid"] =
+                        villageName!!.id.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                    map["persons_visited"] =
+                        Gson().toJson(personalList).toRequestBody("text/plain".toMediaTypeOrNull())
                     if (dailyModel != null) {
-                        map["visitid"] =dailyModel.id.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                        map["visitid"] =
+                            dailyModel.id.toString().toRequestBody("text/plain".toMediaTypeOrNull())
                     }
-                    if (birthdayInfo.value.isNotEmpty() && birthdayInfoFile == null && dailyModel == null) {
+                    /* if (birthdayInfo.value.isNotEmpty() && birthdayInfoFile == null && dailyModel == null) {
+                         current.toast("Photo Mandatory")
+                     } else*/ if (rationShopInfo.value.isNotEmpty() && rationInfoFile == null && dailyModel == null) {
+                    current.toast("Photo Mandatory")
+                } else if (electricInfo.value.isNotEmpty() && electricInfoFile == null && dailyModel == null) {
+                    current.toast("Photo Mandatory")
+                } /* else if (drinkingWaterInfo.value.isNotEmpty() && drinkingInfoFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
-                    } else if (rationShopInfo.value.isNotEmpty() && rationInfoFile == null && dailyModel == null) {
-                        current.toast("Photo Mandatory")
-                    } else if (electricInfo.value.isNotEmpty() && electricInfoFile == null && dailyModel == null) {
-                        current.toast("Photo Mandatory")
-                    }  else if (drinkingWaterInfo.value.isNotEmpty() && drinkingInfoFile == null && dailyModel == null) {
-                        current.toast("Photo Mandatory")
-                    }  else if (waterCanalInfo.value.isNotEmpty() && waterCanalInfoFile == null && dailyModel == null) {
-                        current.toast("Photo Mandatory")
-                    }  else if (schoolInfo.value.isNotEmpty() && schoolInfoFile == null && dailyModel == null) {
-                        current.toast("Photo Mandatory")
-                    }  else if (prathamikInfo.value.isNotEmpty() && primaryHealthInfoFile == null && dailyModel == null) {
-                        current.toast("Photo Mandatory")
-                    }  else if (pashuInfo.value.isNotEmpty() && vetarnityHealthInfoFile == null && dailyModel == null) {
+                    } */ else if (waterCanalInfo.value.isNotEmpty() && waterCanalInfoFile == null && dailyModel == null) {
+                    current.toast("Photo Mandatory")
+                } else if (schoolInfo.value.isNotEmpty() && schoolInfoFile == null && dailyModel == null) {
+                    current.toast("Photo Mandatory")
+                } else if (prathamikInfo.value.isNotEmpty() && primaryHealthInfoFile == null && dailyModel == null) {
+                    current.toast("Photo Mandatory")
+                }/*  else if (pashuInfo.value.isNotEmpty() && vetarnityHealthInfoFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
                     } else if (govEmpInfo.value.isNotEmpty() && govInfoInfoFile == null) {
                         current.toast("Photo Mandatory")
-                    }  else if (politicsInfo.value.isNotEmpty() && politicalInfoFile == null && dailyModel == null) {
+                    }   else if (politicsInfo.value.isNotEmpty() && politicalInfoFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
-                    }   else if (deathPersonInfo.value.isNotEmpty() && deathPersonInfoFile == null && dailyModel == null) {
+                    }  else if (deathPersonInfo.value.isNotEmpty() && deathPersonInfoFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
-                    }    else if (gatLabhYojna.value.isNotEmpty() && yojnaInfoFile == null && dailyModel == null) {
+                    }   else if (gatLabhYojna.value.isNotEmpty() && yojnaInfoFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
                     }     else if (developmentInfo.value.isNotEmpty() && devFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
                     }     else if (otherInfo.value.isNotEmpty() && otherInfoFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
-                    } else {
-                        map["birthdayinfo"] = birthdayInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
-                        if (birthdayInfoFile != null) {
-                            val requestFile = birthdayInfoFile!!.asRequestBody("image/jpg".toMediaType())
-                            birthdayFileBody = MultipartBody.Part.createFormData("birthdayinfofile", birthdayInfoFile!!.name,requestFile)
-                        }
-                        map["rashanshopinfo"] = rationShopInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
-                        if (rationInfoFile != null) {
-                            val requestFile = rationInfoFile!!.asRequestBody("image/jpg".toMediaType())
-                            rashanshopinfoBody = MultipartBody.Part.createFormData("rashanshopinfofile", rationInfoFile!!.name,requestFile)
-                        }
-
-                        map["electricityinfo"] = electricInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
-                        if (electricInfoFile != null) {
-                            val requestFile = electricInfoFile!!.asRequestBody("image/jpg".toMediaType())
-                            rashanshopinfoBody = MultipartBody.Part.createFormData("electricityinfofile", electricInfoFile!!.name,requestFile)
-                        }
-
-                        map["drinkingwaterinfo"] = drinkingWaterInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
-                        if (drinkingInfoFile != null) {
-                            val requestFile = drinkingInfoFile!!.asRequestBody("image/jpg".toMediaType())
-                            drinkingwaterinfofileBody = MultipartBody.Part.createFormData("drinkingwaterinfofile", drinkingInfoFile!!.name,requestFile)
-                        }
-
-                        map["watercanelinfo"] = waterCanalInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
-                        if (waterCanalInfoFile != null) {
-                            val requestFile = waterCanalInfoFile!!.asRequestBody("image/jpg".toMediaType())
-                            watercanelinfofileBody = MultipartBody.Part.createFormData("watercanelinfofile", waterCanalInfoFile!!.name,requestFile)
-                        }
-
-                        map["schoolinfo"] = schoolInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
-                        if (schoolInfoFile != null) {
-                            val requestFile = schoolInfoFile!!.asRequestBody("image/jpg".toMediaType())
-                            schoolinfofileBody = MultipartBody.Part.createFormData("schoolinfofile", schoolInfoFile!!.name,requestFile)
-                        }
-
-                        map["primarycarecenterinfo"] = prathamikInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
-                        if (primaryHealthInfoFile != null) {
-                            val requestFile = primaryHealthInfoFile!!.asRequestBody("image/jpg".toMediaType())
-                            primaryHealthInfoFileBody = MultipartBody.Part.createFormData("primarycarecenterinfofile", primaryHealthInfoFile!!.name,requestFile)
-                        }
-
-                        map["veterinarymedicineinfo"] = pashuInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
-                        if (vetarnityHealthInfoFile != null) {
-                            val requestFile = vetarnityHealthInfoFile!!.asRequestBody("image/jpg".toMediaType())
-                            vetarnityHealthInfoFileBody = MultipartBody.Part.createFormData("veterinarymedicineinfoinfo", vetarnityHealthInfoFile!!.name,requestFile)
-                        }
-
-                        map["govservantinfo"] = govEmpInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
-                        if (govInfoInfoFile != null) {
-                            val requestFile = govInfoInfoFile!!.asRequestBody("image/jpg".toMediaType())
-                            govInfoInfoFileBody = MultipartBody.Part.createFormData("govservantinfofile", govInfoInfoFile!!.name,requestFile)
-                        }
-
-
-                        map["politicalinfo"] = politicsInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
-                        if (politicalInfoFile != null) {
-                            val requestFile = politicalInfoFile!!.asRequestBody("image/jpg".toMediaType())
-                            politicalInfoFileBody = MultipartBody.Part.createFormData("politicalinfofile", politicalInfoFile!!.name,requestFile)
-                        }
-
-                        map["deathpersoninfo"] = deathPersonInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
-                        if (deathPersonInfoFile != null) {
-                            val requestFile = deathPersonInfoFile!!.asRequestBody("image/jpg".toMediaType())
-                            deathPersonInfoFileBody = MultipartBody.Part.createFormData("deathpersoninfofile", deathPersonInfoFile!!.name,requestFile)
-                        }
-                        map["newschemes"] = gatLabhYojna.value.toRequestBody("text/plain".toMediaTypeOrNull())
-                        if (yojnaInfoFile != null) {
-                            val requestFile = yojnaInfoFile!!.asRequestBody("image/jpg".toMediaType())
-                            newschemesfileBody = MultipartBody.Part.createFormData("newschemesfile", yojnaInfoFile!!.name,requestFile)
-                        }
-                        map["devinfo"] = developmentInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
-                        if (devFile != null) {
-                            val requestFile = devFile!!.asRequestBody("image/jpg".toMediaType())
-                            devinfofileBody = MultipartBody.Part.createFormData("devinfofile", devFile!!.name,requestFile)
-                        }
-                        map["otherinfo"] = otherInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
-
-                        if (otherInfoFile != null) {
-                            val requestFile = otherInfoFile!!.asRequestBody("image/jpg".toMediaType())
-                            otherInfoFileBody = MultipartBody.Part.createFormData("otherinfofile", otherInfoFile!!.name,requestFile)
-                        }
-
-                        val isEmpty = otherInfo.value.isEmpty() &&
-                                developmentInfo.value.isEmpty() &&
-                                gatLabhYojna.value.isEmpty() &&
-                                deathPersonInfo.value.isEmpty() &&
-                                politicsInfo.value.isEmpty() &&
-                                govEmpInfo.value.isEmpty() &&
-                                pashuInfo.value.isEmpty() &&
-                                prathamikInfo.value.isEmpty() &&
-                                schoolInfo.value.isEmpty() &&
-                                waterCanalInfo.value.isEmpty() &&
-                                drinkingWaterInfo.value.isEmpty() &&
-                                electricInfo.value.isEmpty() &&
-                                rationShopInfo.value.isEmpty() &&
-                                birthdayInfo.value.isEmpty()
-
-
-                        if(!isEmpty || personalList.isNotEmpty()) {
-                            map["latitude"] =
-                                latitude.toRequestBody("text/plain".toMediaTypeOrNull())
-                            map["longitude"] =
-                                longitude.toRequestBody("text/plain".toMediaTypeOrNull())
-
-                            viewModel.setDailyVisitReq(
-                                dailyModel?.id ?: 0, map,
-                                birthdayFileBody,
-                                rashanshopinfoBody,
-                                electricInfoFileBody,
-                                drinkingwaterinfofileBody,
-                                watercanelinfofileBody,
-                                schoolinfofileBody,
-                                primaryHealthInfoFileBody,
-                                vetarnityHealthInfoFileBody,
-                                govInfoInfoFileBody,
-                                politicalInfoFileBody,
-                                deathPersonInfoFileBody,
-                                newschemesfileBody,
-                                devinfofileBody,
-                                otherInfoFileBody
-                            )
-                        }else{
-                            current.toast("कृपया किमान 1 कार्य पूर्ण करा!")
-                        }
+                    }*/ else {
+                    map["birthdayinfo"] =
+                        birthdayInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                    if (birthdayInfoFile != null) {
+                        val requestFile =
+                            birthdayInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                        birthdayFileBody = MultipartBody.Part.createFormData(
+                            "birthdayinfofile",
+                            birthdayInfoFile!!.name,
+                            requestFile
+                        )
+                    }
+                    map["rashanshopinfo"] =
+                        rationShopInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                    if (rationInfoFile != null) {
+                        val requestFile = rationInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                        rashanshopinfoBody = MultipartBody.Part.createFormData(
+                            "rashanshopinfofile",
+                            rationInfoFile!!.name,
+                            requestFile
+                        )
                     }
 
+                    map["electricityinfo"] =
+                        electricInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                    if (electricInfoFile != null) {
+                        val requestFile =
+                            electricInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                        rashanshopinfoBody = MultipartBody.Part.createFormData(
+                            "electricityinfofile",
+                            electricInfoFile!!.name,
+                            requestFile
+                        )
+                    }
+
+                    map["drinkingwaterinfo"] =
+                        drinkingWaterInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                    if (drinkingInfoFile != null) {
+                        val requestFile =
+                            drinkingInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                        drinkingwaterinfofileBody = MultipartBody.Part.createFormData(
+                            "drinkingwaterinfofile",
+                            drinkingInfoFile!!.name,
+                            requestFile
+                        )
+                    }
+
+                    map["watercanelinfo"] =
+                        waterCanalInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                    if (waterCanalInfoFile != null) {
+                        val requestFile =
+                            waterCanalInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                        watercanelinfofileBody = MultipartBody.Part.createFormData(
+                            "watercanelinfofile",
+                            waterCanalInfoFile!!.name,
+                            requestFile
+                        )
+                    }
+
+                    map["schoolinfo"] =
+                        schoolInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                    if (schoolInfoFile != null) {
+                        val requestFile = schoolInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                        schoolinfofileBody = MultipartBody.Part.createFormData(
+                            "schoolinfofile",
+                            schoolInfoFile!!.name,
+                            requestFile
+                        )
+                    }
+
+                    map["primarycarecenterinfo"] =
+                        prathamikInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                    if (primaryHealthInfoFile != null) {
+                        val requestFile =
+                            primaryHealthInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                        primaryHealthInfoFileBody = MultipartBody.Part.createFormData(
+                            "primarycarecenterinfofile",
+                            primaryHealthInfoFile!!.name,
+                            requestFile
+                        )
+                    }
+
+                    map["veterinarymedicineinfo"] =
+                        pashuInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                    if (vetarnityHealthInfoFile != null) {
+                        val requestFile =
+                            vetarnityHealthInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                        vetarnityHealthInfoFileBody = MultipartBody.Part.createFormData(
+                            "veterinarymedicineinfoinfo",
+                            vetarnityHealthInfoFile!!.name,
+                            requestFile
+                        )
+                    }
+
+                    map["govservantinfo"] =
+                        govEmpInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                    if (govInfoInfoFile != null) {
+                        val requestFile = govInfoInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                        govInfoInfoFileBody = MultipartBody.Part.createFormData(
+                            "govservantinfofile",
+                            govInfoInfoFile!!.name,
+                            requestFile
+                        )
+                    }
+
+
+                    map["politicalinfo"] =
+                        politicsInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                    if (politicalInfoFile != null) {
+                        val requestFile =
+                            politicalInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                        politicalInfoFileBody = MultipartBody.Part.createFormData(
+                            "politicalinfofile",
+                            politicalInfoFile!!.name,
+                            requestFile
+                        )
+                    }
+
+                    map["deathpersoninfo"] =
+                        deathPersonInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                    if (deathPersonInfoFile != null) {
+                        val requestFile =
+                            deathPersonInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                        deathPersonInfoFileBody = MultipartBody.Part.createFormData(
+                            "deathpersoninfofile",
+                            deathPersonInfoFile!!.name,
+                            requestFile
+                        )
+                    }
+                    map["newschemes"] =
+                        gatLabhYojna.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                    if (yojnaInfoFile != null) {
+                        val requestFile = yojnaInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                        newschemesfileBody = MultipartBody.Part.createFormData(
+                            "newschemesfile",
+                            yojnaInfoFile!!.name,
+                            requestFile
+                        )
+                    }
+                    map["devinfo"] =
+                        developmentInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+                    if (devFile != null) {
+                        val requestFile = devFile!!.asRequestBody("image/jpg".toMediaType())
+                        devinfofileBody = MultipartBody.Part.createFormData(
+                            "devinfofile",
+                            devFile!!.name,
+                            requestFile
+                        )
+                    }
+                    map["otherinfo"] =
+                        otherInfo.value.toRequestBody("text/plain".toMediaTypeOrNull())
+
+                    if (otherInfoFile != null) {
+                        val requestFile = otherInfoFile!!.asRequestBody("image/jpg".toMediaType())
+                        otherInfoFileBody = MultipartBody.Part.createFormData(
+                            "otherinfofile",
+                            otherInfoFile!!.name,
+                            requestFile
+                        )
+                    }
+
+                    val isEmpty = otherInfo.value.isEmpty() &&
+                            developmentInfo.value.isEmpty() &&
+                            gatLabhYojna.value.isEmpty() &&
+                            deathPersonInfo.value.isEmpty() &&
+                            politicsInfo.value.isEmpty() &&
+                            govEmpInfo.value.isEmpty() &&
+                            pashuInfo.value.isEmpty() &&
+                            prathamikInfo.value.isEmpty() &&
+                            schoolInfo.value.isEmpty() &&
+                            waterCanalInfo.value.isEmpty() &&
+                            drinkingWaterInfo.value.isEmpty() &&
+                            electricInfo.value.isEmpty() &&
+                            rationShopInfo.value.isEmpty() &&
+                            birthdayInfo.value.isEmpty()
+
+
+                    if (!isEmpty || personalList.isNotEmpty()) {
+                        map["latitude"] =
+                            latitude.toRequestBody("text/plain".toMediaTypeOrNull())
+                        map["longitude"] =
+                            longitude.toRequestBody("text/plain".toMediaTypeOrNull())
+
+                        viewModel.setDailyVisitReq(
+                            dailyModel?.id ?: 0, map,
+                            birthdayFileBody,
+                            rashanshopinfoBody,
+                            electricInfoFileBody,
+                            drinkingwaterinfofileBody,
+                            watercanelinfofileBody,
+                            schoolinfofileBody,
+                            primaryHealthInfoFileBody,
+                            vetarnityHealthInfoFileBody,
+                            govInfoInfoFileBody,
+                            politicalInfoFileBody,
+                            deathPersonInfoFileBody,
+                            newschemesfileBody,
+                            devinfofileBody,
+                            otherInfoFileBody
+                        )
+                    } else {
+                        current.toast("कृपया किमान 1 कार्य पूर्ण करा!")
+                    }
+                }
 
 
                 }, modifier = Modifier
@@ -933,8 +1014,6 @@ class PersonVisitedModel(val id: String) {
     var isS = mutableStateOf(false)
     var isIn = mutableStateOf(false)
     var isSu = mutableStateOf(false)
-
-
 }
 
 

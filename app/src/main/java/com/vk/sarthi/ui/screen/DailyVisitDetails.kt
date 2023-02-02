@@ -37,6 +37,7 @@ import com.vk.sarthi.ui.theme.FontColor1
 import com.vk.sarthi.ui.theme.FontColor1Dark
 import com.vk.sarthi.ui.theme.FontColor2
 import com.vk.sarthi.ui.theme.WindowColor
+import com.vk.sarthi.utli.Util
 import com.vk.sarthi.viewmodel.DailyVisitStateList
 import com.vk.sarthi.viewmodel.DailyVisitVM
 
@@ -66,25 +67,30 @@ fun DailyVisitDetailsUI(workID: String, navigatorController: NavHostController?)
                 null
             },
             actions = {
-                Icon(
-                    imageVector = Icons.Outlined.Edit,
-                    contentDescription = "Edit",
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .clickable {
-                            navigatorController!!.navigate(Screens.AddDailyVisit.route + "/" + dailyModel!!.id)
-                        }
-                )
+                dailyModel?.let {
+                    if(Util.isTodayDate(it.createddate)) {
+                        Icon(
+                            imageVector = Icons.Outlined.Edit,
+                            contentDescription = "Edit",
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .clickable {
+                                    navigatorController!!.navigate(Screens.AddDailyVisit.route + "/" + dailyModel!!.id)
+                                }
+                        )
 
-                Icon(
-                    imageVector = Icons.Outlined.Delete,
-                    contentDescription = "Delete",
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .clickable {
-                            showDialog.value = true
-                        }
-                )
+                        Icon(
+                            imageVector = Icons.Outlined.Delete,
+                            contentDescription = "Delete",
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .clickable {
+                                    showDialog.value = true
+                                }
+                        )
+                    }
+                }
+
             }
         )
     },
