@@ -1,5 +1,6 @@
 package com.vk.sarthi.viewmodel
 
+import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vk.sarthi.WifiService
@@ -23,7 +24,7 @@ import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
-class AddDailyVisitViewModel @Inject constructor(private val service: Service): ViewModel() {
+class AddDailyVisitViewModel @Inject constructor(private val service: Service,val pref: SharedPreferences): ViewModel() {
     private var state: MutableStateFlow<WorkState> = MutableStateFlow(WorkState.Empty)
     val stateExpose = state.asStateFlow()
 
@@ -71,8 +72,23 @@ class AddDailyVisitViewModel @Inject constructor(private val service: Service): 
                 }
             }
         }else{
-            state.value = WorkState.Failed(Constants.NO_INTERNET)
+           Cache.addOfficeWorkOffline(pref,OfficeWorkOfflineModel(
+               commentTxt = commentTxt,
+               coordinatorid = Cache.loginUser!!.id.toString(),
+               usermobileno = Cache.loginUser!!.mobileno,
+               filePath = if(file!=null){file.path}else{""}
+           ))
+           state.value = WorkState.Success("Save Offline")
         }
 
     }
 }
+
+
+
+data class  OfficeWorkOfflineModel(
+    val  commentTxt:String,
+    val  coordinatorid:String,
+    val  usermobileno:String,
+    val  filePath:String,
+)

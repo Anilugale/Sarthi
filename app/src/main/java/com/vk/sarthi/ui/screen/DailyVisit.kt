@@ -14,6 +14,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.material.icons.rounded.Menu
@@ -32,6 +33,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.vk.sarthi.R
+import com.vk.sarthi.WifiService
 import com.vk.sarthi.cache.Cache
 import com.vk.sarthi.model.DailyVisitModel
 import com.vk.sarthi.model.Village
@@ -107,12 +109,13 @@ fun DailyVisit(navigatorController: NavHostController?) {
                 )
             ) {
                 FloatingActionButton(onClick = {
+                    if (Cache.villageData==null) {
+                        Cache.restoreVillageData(context)
+                        context.toast("Offline")
+                    }
                     if (Cache.villageData!=null) {
                         navigatorController?.navigate(Screens.AddDailyVisit.route + "/0")
-                    }else{
-                        context.toast("No village found")
                     }
-
                 }) {
                     Icon(Icons.Filled.Add, "")
                 }

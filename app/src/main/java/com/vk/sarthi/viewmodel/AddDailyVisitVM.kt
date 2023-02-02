@@ -1,5 +1,6 @@
 package com.vk.sarthi.viewmodel
 
+import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vk.sarthi.WifiService
@@ -19,7 +20,7 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class AddDailyVisitVM @Inject constructor(val service: Service) : ViewModel() {
+class AddDailyVisitVM @Inject constructor(val service: Service,val pref: SharedPreferences) : ViewModel() {
     private var state: MutableStateFlow<DailyVisitState> = MutableStateFlow(DailyVisitState.Empty)
     val stateExpose = state.asStateFlow()
 

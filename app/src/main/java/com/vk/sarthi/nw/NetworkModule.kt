@@ -1,9 +1,13 @@
 package com.vk.sarthi.nw
 
+import android.content.Context
+import android.content.SharedPreferences
 import com.vk.sarthi.service.Service
+import com.vk.sarthi.utli.SettingPreferences
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -48,4 +52,9 @@ object NetworkModule {
     @Provides
     fun provideCCoOrdinatorService(retrofit: Retrofit): Service =
         retrofit.create(Service::class.java)
+
+    @Singleton
+    @Provides
+    fun getPreference(@ApplicationContext context: Context): SharedPreferences =
+        SettingPreferences.get(context)
 }

@@ -6,6 +6,7 @@ import com.vk.sarthi.WifiService
 import com.vk.sarthi.cache.Cache
 import com.vk.sarthi.model.*
 import com.vk.sarthi.service.Service
+import com.vk.sarthi.ui.screen.WorkState
 import com.vk.sarthi.utli.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -13,6 +14,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,6 +28,9 @@ class OfficeWorkViewModel @Inject constructor(private val service: Service) : Vi
     private var state: MutableStateFlow<Status> = MutableStateFlow(Status.Empty)
     val stateExpose = state.asStateFlow()
 
+
+    private var synchState: MutableStateFlow<Status> = MutableStateFlow(Status.Empty)
+    val synchStateExpose = synchState.asStateFlow()
 
     fun getList() {
         if (Cache.officeWorkModelList.isEmpty()) {
@@ -90,6 +101,49 @@ class OfficeWorkViewModel @Inject constructor(private val service: Service) : Vi
 
     }
 
+    fun syncData(officeWorkOfflineList: java.util.ArrayList<OfficeWorkOfflineModel>) {
+       synchState.value = Status.ProcessDialog(true)
+        val removeList = arrayListOf<OfficeWorkOfflineModel>()
+        viewModelScope.launch {
+            delay(1000)
+           officeWorkOfflineList.forEach {
+                if (!it.commentTxt.isNullOrEmpty()) {
+
+                    val commentTxtP: RequestBody =
+                        it.commentTxt.toRequestBody("text/plain".toMediaTypeOrNull())
+                    val coordinatorIdP: RequestBody =
+                        Cache.loginUser!!.id.toString()
+                            .toRequestBody("text/plain".toMediaTypeOrNull())
+                    val mobileNo: RequestBody =
+                        Cache.loginUser!!.mobileno.toRequestBody("text/plain".toMediaTypeOrNull())
+
+                    val map: HashMap<String, RequestBody> = HashMap()
+                    map["coordinatorid"] = coordinatorIdP
+                    map["comment"] = commentTxtP
+                    map["usermobileno"] = mobileNo
+
+
+                    var body: MultipartBody.Part? = null
+                    if (!it.filePath.isNullOrEmpty()) {
+                        val file = File(it.filePath)
+                        val requestFile = file.asRequestBody("image/jpg".toMediaType())
+                        body = MultipartBody.Part.createFormData("file", file.name, requestFile)
+                    }
+                    val response = service.createWorkTask(map,body)
+                    if (response.isSuccessful && response.body() != null) {
+                        if (response.body()!!.data != null) {
+                            Cache.officeWorkModelList.add(response.body()!!.data)
+                            removeList.add(it)
+                        }
+                    }
+                }else{
+                    removeList.add(it)
+                }
+            }
+            synchState.value = Status.ProcessDialog(false)
+        }
+    }
+
 }
 
 
@@ -107,4 +161,5 @@ sealed interface Status {
     data class SuccessDelete(val msg: String,val list: ArrayList<OfficeWorkModel>) : Status
     data class FailedDelete(val msg: String) : Status
     data class ProcessHeader(val isShow: Boolean) : Status
+    data class ProcessDialog(val isShow: Boolean) : Status
 }

@@ -37,6 +37,7 @@ import com.vk.sarthi.ui.theme.FontColor2
 import com.vk.sarthi.ui.theme.Teal200
 import com.vk.sarthi.ui.theme.WindowColor
 import com.vk.sarthi.utli.SettingPreferences
+import com.vk.sarthi.utli.Util
 import com.vk.sarthi.viewmodel.MainViewModel
 import com.vk.sarthi.viewmodel.VillageState
 import kotlinx.coroutines.launch
@@ -102,6 +103,8 @@ fun Dashboard(
                 }
             }
             VillageState.Success -> {
+
+                Cache.storeVillageData(LocalContext.current)
                 Box(modifier = Modifier.fillMaxSize().padding(it), contentAlignment = Alignment.Center) {
                     if (Cache.villageData != null) {
                         LazyColumn(

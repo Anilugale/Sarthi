@@ -5,10 +5,6 @@ import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.keyframes
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,7 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.Attachment
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
@@ -34,7 +30,6 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.vk.sarthi.R
+import com.vk.sarthi.WifiService
 import com.vk.sarthi.cache.Cache
 import com.vk.sarthi.model.OfficeWorkModel
 import com.vk.sarthi.ui.nav.BottomNavigationBar
@@ -62,7 +58,29 @@ fun OfficeWork(navigatorController: NavHostController?) {
     }
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
+    val current = LocalContext.current
+    val model: OfficeWorkViewModel = hiltViewModel()
+    val viewModel = remember { model }
 
+    val syncState = model.synchStateExpose.collectAsState().value
+    var showProgressDialog  = remember {
+        mutableStateOf(false)
+    }
+    when (syncState) {
+        is Status.ProcessDialog -> {
+            showProgressDialog.value =  syncState.isShow
+            if (syncState.isShow == false) {
+
+            Cache.clearOfflineOfficeWork(current)
+            }
+        }
+        else->{
+
+        }
+    }
+    if (showProgressDialog.value) {
+        ShowProgressDialog()
+    }
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
@@ -70,7 +88,7 @@ fun OfficeWork(navigatorController: NavHostController?) {
                 title = {
                     Row {
                         Text(
-                            text = LocalContext.current.getString(R.string.office_work),
+                            text = current.getString(R.string.office_work),
                             fontSize = 18.sp
                         )
                         AnimatedVisibility(visible = isProgressShow.value) {
@@ -97,6 +115,19 @@ fun OfficeWork(navigatorController: NavHostController?) {
                             contentDescription = ""
                         )
                     }
+                }, actions = {
+                    if(Cache.isOfflineOfficeWork(current) && WifiService.instance.isOnline()) {
+                        IconButton(onClick = {
+                            scope.launch {
+                                viewModel.syncData(Cache.officeWorkOfflineList)
+                            }
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.Refresh,
+                                contentDescription = "sync"
+                            )
+                        }
+                    }
                 }
             )
         },
@@ -114,7 +145,7 @@ fun OfficeWork(navigatorController: NavHostController?) {
         }
     ) {
         Box(modifier = Modifier.padding(paddingValues = it)) {
-            ShowOfficeListUI(navigatorController, listState, isProgressShow)
+            ShowOfficeListUI(navigatorController, listState, isProgressShow,viewModel)
         }
 
     }
@@ -124,13 +155,12 @@ fun OfficeWork(navigatorController: NavHostController?) {
 fun ShowOfficeListUI(
     navigatorController: NavHostController?,
     listState: LazyListState,
-    isProgressShow: MutableState<Boolean>
+    isProgressShow: MutableState<Boolean>,
+    model: OfficeWorkViewModel
 ) {
-    val model: OfficeWorkViewModel = hiltViewModel()
-    val viewModel = remember { model }
-    val targetState = viewModel.stateExpose.collectAsState().value
-    val context = LocalContext.current
 
+    val context = LocalContext.current
+    val targetState = model.stateExpose.collectAsState().value
 
 
     LaunchedEffect(key1 = Cache.officeWorkModelList) {

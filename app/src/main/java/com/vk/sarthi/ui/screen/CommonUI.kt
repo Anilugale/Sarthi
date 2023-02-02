@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.R
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -12,13 +13,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import com.valentinilk.shimmer.shimmer
 import com.vk.sarthi.cache.Cache
@@ -344,6 +349,31 @@ fun DropDownSpinner(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun ShowProgressDialog() {
+
+    Dialog(
+        onDismissRequest = {},
+        properties = DialogProperties(
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false,
+            usePlatformDefaultWidth = true
+        )
+    ) {
+        Card(backgroundColor = Color.White) {
+            Box(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(25.dp), contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = MaterialTheme.colors.secondary)
+            }
+        }
+    }
+
+}
+
 @Composable
 @Preview
 fun headerProgressV() {
@@ -352,3 +382,4 @@ fun headerProgressV() {
             .size(30.dp)
             .padding(start = 10.dp))
 }
+
