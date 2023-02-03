@@ -3,8 +3,6 @@ package com.vk.sarthi.ui.screen
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build.VERSION
-import android.os.Build.VERSION_CODES
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -54,8 +52,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.*
-import java.util.*
+import java.io.File
 
 
 @Composable
@@ -133,7 +130,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
         }
 
         var currentFile by remember { mutableStateOf<Uri?>(null) }
-        var SelectionFileType by remember { mutableStateOf("") }
+        var selectionFileType by remember { mutableStateOf("") }
 
         var devFile by remember { mutableStateOf<File?>(null) }
         var rationInfoFile by remember { mutableStateOf<File?>(null) }
@@ -155,86 +152,97 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
             currentFile = uri
             uri?.apply {
                 // upload file
-                if (SelectionFileType == Constants.DEV_INFO) {
-                    devFile = File(uri.path)
-                    Log.d("@@", "dev info file : $devFile")
-                } else if (Constants.RASATION_INFO == SelectionFileType) {
-                    rationInfoFile = File(uri.path)
-                    Log.d("@@", "dev info file : $devFile")
+                path?.apply {
+                    if (selectionFileType == Constants.DEV_INFO) {
+                        devFile = File(this)
+                        Log.d("@@", "dev info file : $devFile")
+                    } else if (Constants.RASATION_INFO == selectionFileType) {
+                        rationInfoFile = File(this)
+                        Log.d("@@", "dev info file : $devFile")
+                    }
+
+                    when (selectionFileType) {
+                        Constants.DEV_INFO -> {
+                            devFile = File(this)
+                        }
+                        Constants.RASATION_INFO -> {
+                            rationInfoFile = File(this)
+                        }
+                        Constants.ELECTRIC_INFO -> {
+                            electricInfoFile = File(this)
+                        }
+                        Constants.DRINKING_WATER -> {
+                            drinkingInfoFile = File(this)
+                        }
+                        Constants.WATER_CANAL -> {
+                            waterCanalInfoFile = File(this)
+                        }
+
+                        Constants.SCHOOL_INFO -> {
+                            schoolInfoFile = File(this)
+                        }
+
+                        Constants.PRIMARAY_HELATH -> {
+                            primaryHealthInfoFile = File(this)
+                        }
+
+                        Constants.VETARNARY_HEALTH -> {
+                            vetarnityHealthInfoFile = File(this)
+                        }
+                        Constants.GOV_INFO -> {
+                            govInfoInfoFile = File(this)
+                        }
+                        Constants.POLITICAL_INFO -> {
+                            politicalInfoFile = File(this)
+                        }
+
+                        Constants.DEATH_PERSON_INFO -> {
+                            deathPersonInfoFile = File(this)
+                        }
+                        Constants.BIRTHDAY_INFO -> {
+                            birthdayInfoFile = File(this)
+                        }
+
+                        Constants.YOJNA_INFO_INFO -> {
+                            yojnaInfoFile = File(this)
+                        }
+
+                        Constants.OTHER_INFO -> {
+                            otherInfoFile = File(this)
+                        }
+                        else -> {}
+                    }
+
                 }
-
-                when (SelectionFileType) {
-                    Constants.DEV_INFO -> {
-                        devFile = File(uri.path)
-                    }
-                    Constants.RASATION_INFO -> {
-                        rationInfoFile = File(uri.path)
-                    }
-                    Constants.ELECTRIC_INFO -> {
-                        electricInfoFile = File(uri.path)
-                    }
-                    Constants.DRINKING_WATER -> {
-                        drinkingInfoFile = File(uri.path)
-                    }
-                    Constants.WATER_CANAL -> {
-                        waterCanalInfoFile = File(uri.path)
-                    }
-
-                    Constants.SCHOOL_INFO -> {
-                        schoolInfoFile = File(uri.path)
-                    }
-
-                    Constants.PRIMARAY_HELATH -> {
-                        primaryHealthInfoFile = File(uri.path)
-                    }
-
-                    Constants.VETARNARY_HEALTH -> {
-                        vetarnityHealthInfoFile = File(uri.path)
-                    }
-                    Constants.GOV_INFO -> {
-                        govInfoInfoFile = File(uri.path)
-                    }
-                    Constants.POLITICAL_INFO -> {
-                        politicalInfoFile = File(uri.path)
-                    }
-
-                    Constants.DEATH_PERSON_INFO -> {
-                        deathPersonInfoFile = File(uri.path)
-                    }
-                    Constants.BIRTHDAY_INFO -> {
-                        birthdayInfoFile = File(uri.path)
-                    }
-
-                    Constants.YOJNA_INFO_INFO -> {
-                        yojnaInfoFile = File(uri.path)
-                    }
-
-                    Constants.OTHER_INFO -> {
-                        otherInfoFile = File(uri.path)
-                    }
-                    else -> {}
-                }
-
-
             }
         }
-        val cameraLauncher =
-            rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
                 if (success) {
                     currentFile?.let { uri ->
                         uCropLauncher.launch(
                             Pair(
                                 first = uri,
                                 second = Uri.fromFile(
-                                    File(current.cacheDir, "temp_image_file_${Date().time}")
+                                    File(current.cacheDir, "temp_image_file_${System.currentTimeMillis()}")
                                 )
                             )
                         )
                     }
-                } else {
-                    current.toast("Cannot save the image!")
                 }
             }
+
+        val imagePickerLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+            if (uri != null) {
+                uCropLauncher.launch(
+                    Pair(
+                        first = uri,
+                        second = Uri.fromFile(
+                            File(current.cacheDir, "temp_image_file_${System.currentTimeMillis()}")
+                        )
+                    )
+                )
+            }
+        }
 
         val developmentInfo =
             remember { mutableStateOf(if (dailyModel?.devinfo != null) dailyModel.devinfo else "") }
@@ -280,13 +288,13 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
             var selectedVillage: Village? = null
             if (dailyModel != null && Cache.villageData != null) {
                 selectedVillage =
-                    Cache.villageData!!.villages.single { dailyModel.villageid == it.id }
+                    Cache.villageData!!.villages.single {model-> dailyModel.villageid == model.id }
             }
 
             var ganName by remember { mutableStateOf(selectedVillage?.gan ?: "") }
             var villageName by remember { mutableStateOf(selectedVillage) }
 
-            val list = Cache.villageData!!.villages.groupBy { it.gan }
+            val list = Cache.villageData!!.villages.groupBy { model-> model.gan }
             val gatList = list.keys
 
             DropDownSpinner(
@@ -349,7 +357,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
             OutlinedTextField(
                 value = developmentInfo.value,
-                onValueChange = { developmentInfo.value = it },
+                onValueChange = {model-> developmentInfo.value = model },
                 label = { Text(text = stringResource(R.string.development_info)) },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -359,8 +367,8 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     Button(onClick = {
                         val newPhotoUri = current.createImageFile().getUriForFile(current)
                         currentFile = newPhotoUri
-                        SelectionFileType = Constants.DEV_INFO
-                        cameraLauncher.launch(newPhotoUri)
+                        selectionFileType = Constants.DEV_INFO
+                        imagePickerLauncher.launch("image/*")
                     }) {
                         Text(text = stringResource(R.string.development_info) + " photo")
                     }
@@ -385,7 +393,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
             OutlinedTextField(
                 value = rationShopInfo.value,
-                onValueChange = { rationShopInfo.value = it },
+                onValueChange = {model-> rationShopInfo.value = model },
                 label = { Text(text = stringResource(R.string.ration_info)) },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -394,10 +402,10 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     Button(onClick = {
                         val newPhotoUri = current.createImageFile().getUriForFile(current)
                         currentFile = newPhotoUri
-                        SelectionFileType = Constants.RASATION_INFO
+                        selectionFileType = Constants.RASATION_INFO
                         cameraLauncher.launch(newPhotoUri)
                     }) {
-                        Text(text = stringResource(R.string.ration_info) + " photo")
+                        Text(text = stringResource(R.string.ration_info) + " photo *")
                     }
                 }
                 if (rationInfoFile != null) {
@@ -415,7 +423,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
             }
             OutlinedTextField(
                 value = electricInfo.value,
-                onValueChange = { electricInfo.value = it },
+                onValueChange = {model-> electricInfo.value = model },
                 label = { Text(text = stringResource(R.string.electric_info)) },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -424,10 +432,10 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 Button(onClick = {
                     val newPhotoUri = current.createImageFile().getUriForFile(current)
                     currentFile = newPhotoUri
-                    SelectionFileType = Constants.ELECTRIC_INFO
+                    selectionFileType = Constants.ELECTRIC_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.electric_info) + " photo")
+                    Text(text = stringResource(R.string.electric_info) + " photo * ")
 
                 }
             }
@@ -447,7 +455,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
             OutlinedTextField(
                 value = drinkingWaterInfo.value,
-                onValueChange = { drinkingWaterInfo.value = it },
+                onValueChange = { model-> drinkingWaterInfo.value = model },
                 label = { Text(text = stringResource(R.string.drinking_water_info)) },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -456,8 +464,8 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 Button(onClick = {
                     val newPhotoUri = current.createImageFile().getUriForFile(current)
                     currentFile = newPhotoUri
-                    SelectionFileType = Constants.DRINKING_WATER
-                    cameraLauncher.launch(newPhotoUri)
+                    selectionFileType = Constants.DRINKING_WATER
+                    imagePickerLauncher.launch("image/*")
                 }) {
                     Text(text = stringResource(R.string.drinking_water_info) + " photo")
 
@@ -481,7 +489,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
             OutlinedTextField(
                 value = waterCanalInfo.value,
-                onValueChange = { waterCanalInfo.value = it },
+                onValueChange = { model-> waterCanalInfo.value = model },
                 label = { Text(text = stringResource(R.string.water_canal_info)) },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -490,10 +498,10 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 Button(onClick = {
                     val newPhotoUri = current.createImageFile().getUriForFile(current)
                     currentFile = newPhotoUri
-                    SelectionFileType = Constants.WATER_CANAL
+                    selectionFileType = Constants.WATER_CANAL
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.water_canal_info) + " photo")
+                    Text(text = stringResource(R.string.water_canal_info) + " photo *")
 
                 }
             }
@@ -514,7 +522,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
             OutlinedTextField(
                 value = schoolInfo.value,
-                onValueChange = { schoolInfo.value = it },
+                onValueChange = { model-> schoolInfo.value = model },
                 label = { Text(text = stringResource(R.string.school_info)) },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -523,10 +531,10 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 Button(onClick = {
                     val newPhotoUri = current.createImageFile().getUriForFile(current)
                     currentFile = newPhotoUri
-                    SelectionFileType = Constants.SCHOOL_INFO
+                    selectionFileType = Constants.SCHOOL_INFO
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.school_info) + " photo")
+                    Text(text = stringResource(R.string.school_info) + " photo * ")
 
                 }
             }
@@ -546,7 +554,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
             OutlinedTextField(
                 value = prathamikInfo.value,
-                onValueChange = { prathamikInfo.value = it },
+                onValueChange = {model-> prathamikInfo.value = model },
                 label = { Text(text = stringResource(R.string.prathamik_info)) },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -555,10 +563,10 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 Button(onClick = {
                     val newPhotoUri = current.createImageFile().getUriForFile(current)
                     currentFile = newPhotoUri
-                    SelectionFileType = Constants.PRIMARAY_HELATH
+                    selectionFileType = Constants.PRIMARAY_HELATH
                     cameraLauncher.launch(newPhotoUri)
                 }) {
-                    Text(text = stringResource(R.string.prathamik_info) + " photo")
+                    Text(text = stringResource(R.string.prathamik_info) + " photo * ")
                 }
             }
             if (primaryHealthInfoFile != null) {
@@ -576,7 +584,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
         }
             OutlinedTextField(
                 value = pashuInfo.value,
-                onValueChange = { pashuInfo.value = it },
+                onValueChange = {model-> pashuInfo.value = model },
                 label = { Text(text = stringResource(R.string.pashu_info)) },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -585,8 +593,8 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 Button(onClick = {
                     val newPhotoUri = current.createImageFile().getUriForFile(current)
                     currentFile = newPhotoUri
-                    SelectionFileType = Constants.VETARNARY_HEALTH
-                    cameraLauncher.launch(newPhotoUri)
+                    selectionFileType = Constants.VETARNARY_HEALTH
+                    imagePickerLauncher.launch("image/*")
                 }) {
                     Text(text = stringResource(R.string.pashu_info) + " Photo")
                 }
@@ -607,7 +615,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
             OutlinedTextField(
                 value = govEmpInfo.value,
-                onValueChange = { govEmpInfo.value = it },
+                onValueChange = { model-> govEmpInfo.value = model },
                 label = { Text(text = stringResource(R.string.gov_emp_info)) },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -616,8 +624,8 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 Button(onClick = {
                     val newPhotoUri = current.createImageFile().getUriForFile(current)
                     currentFile = newPhotoUri
-                    SelectionFileType = Constants.GOV_INFO
-                    cameraLauncher.launch(newPhotoUri)
+                    selectionFileType = Constants.GOV_INFO
+                    imagePickerLauncher.launch("image/*")
                 }) {
                     Text(text = stringResource(R.string.gov_emp_info) + " Photo")
                 }
@@ -638,7 +646,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
             OutlinedTextField(
                 value = politicsInfo.value,
-                onValueChange = { politicsInfo.value = it },
+                onValueChange = { model-> politicsInfo.value = model },
                 label = { Text(text = stringResource(R.string.politics_info)) },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -648,8 +656,8 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     Button(onClick = {
                         val newPhotoUri = current.createImageFile().getUriForFile(current)
                         currentFile = newPhotoUri
-                        SelectionFileType = Constants.POLITICAL_INFO
-                        cameraLauncher.launch(newPhotoUri)
+                        selectionFileType = Constants.POLITICAL_INFO
+                        imagePickerLauncher.launch("image/*")
                     }) {
                         Text(text = stringResource(R.string.gov_emp_info) + " Photo")
                     }
@@ -667,20 +675,20 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     )
                 }
             }
-            Row {
+
                 OutlinedTextField(
                     value = deathPersonInfo.value,
-                    onValueChange = { deathPersonInfo.value = it },
+                    onValueChange = {model-> deathPersonInfo.value = model },
                     label = { Text(text = stringResource(R.string.death_person_info)) },
                     modifier = Modifier.fillMaxWidth()
                 )
-
+            Row {
                 if (deathPersonInfo.value.isNotEmpty()) {
                     Button(onClick = {
                         val newPhotoUri = current.createImageFile().getUriForFile(current)
                         currentFile = newPhotoUri
-                        SelectionFileType = Constants.DEATH_PERSON_INFO
-                        cameraLauncher.launch(newPhotoUri)
+                        selectionFileType = Constants.DEATH_PERSON_INFO
+                        imagePickerLauncher.launch("image/*")
                     }) {
                         Text(text = stringResource(R.string.death_person_info) + " Photo")
                     }
@@ -701,7 +709,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
             OutlinedTextField(
                 value = birthdayInfo.value,
-                onValueChange = { birthdayInfo.value = it },
+                onValueChange = { model-> birthdayInfo.value = model },
                 label = { Text(text = stringResource(R.string.birthday_info)) },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -710,8 +718,8 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     Button(onClick = {
                         val newPhotoUri = current.createImageFile().getUriForFile(current)
                         currentFile = newPhotoUri
-                        SelectionFileType = Constants.BIRTHDAY_INFO
-                        cameraLauncher.launch(newPhotoUri)
+                        selectionFileType = Constants.BIRTHDAY_INFO
+                        imagePickerLauncher.launch("image/*")
                     }) {
                         Text(text = stringResource(R.string.birthday_info) + " Photo")
                     }
@@ -732,7 +740,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
             OutlinedTextField(
                 value = gatLabhYojna.value,
-                onValueChange = { gatLabhYojna.value = it },
+                onValueChange = { model-> gatLabhYojna.value = model },
                 label = { Text(text = stringResource(R.string.gat_labh_yojna)) },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -741,8 +749,8 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     Button(onClick = {
                         val newPhotoUri = current.createImageFile().getUriForFile(current)
                         currentFile = newPhotoUri
-                        SelectionFileType = Constants.YOJNA_INFO_INFO
-                        cameraLauncher.launch(newPhotoUri)
+                        selectionFileType = Constants.YOJNA_INFO_INFO
+                        imagePickerLauncher.launch("image/*")
                     }) {
                         Text(text = stringResource(R.string.gat_labh_yojna) + " Photo")
                     }
@@ -763,7 +771,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
             OutlinedTextField(
                 value = otherInfo.value,
-                onValueChange = { otherInfo.value = it },
+                onValueChange = {model-> otherInfo.value = model },
                 label = { Text(text = stringResource(R.string.other_info)) },
                 modifier = Modifier.fillMaxWidth(),
 
@@ -773,8 +781,8 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 Button(onClick = {
                     val newPhotoUri = current.createImageFile().getUriForFile(current)
                     currentFile = newPhotoUri
-                    SelectionFileType = Constants.OTHER_INFO
-                    cameraLauncher.launch(newPhotoUri)
+                    selectionFileType = Constants.OTHER_INFO
+                    imagePickerLauncher.launch("image/*")
                 }) {
                     Text(text = stringResource(R.string.other_info) + " Photo")
                 }
@@ -801,29 +809,29 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                         return@Button
                     }
                     val personalList = arrayListOf<PersonsVisited>()
-                    personVisitedList.forEach {
-                        Log.d("@@", "AddDailyVisit: $it")
-                        resetErrorFlag(it)
-                        if (it.name.value.isNotEmpty() || it.subject.value.isNotEmpty() || it.information.value.isNotEmpty() || it.survey.value.isNotEmpty()) {
-                            if (it.name.value.isEmpty()) {
-                                it.isN.value = true
+                    personVisitedList.forEach { person->
+                        Log.d("@@", "AddDailyVisit: $person")
+                        resetErrorFlag(person)
+                        if (person.name.value.isNotEmpty() || person.subject.value.isNotEmpty() || person.information.value.isNotEmpty() || person.survey.value.isNotEmpty()) {
+                            if (person.name.value.isEmpty()) {
+                                person.isN.value = true
                                 return@Button
-                            } else if (it.subject.value.isEmpty()) {
-                                it.isS.value = true
+                            } else if (person.subject.value.isEmpty()) {
+                                person.isS.value = true
                                 return@Button
-                            } else if (it.information.value.isEmpty()) {
-                                it.isIn.value = true
+                            } else if (person.information.value.isEmpty()) {
+                                person.isIn.value = true
                                 return@Button
-                            } else if (it.survey.value.isEmpty()) {
-                                it.isSu.value = true
+                            } else if (person.survey.value.isEmpty()) {
+                                person.isSu.value = true
                                 return@Button
                             } else {
                                 personalList.add(
                                     PersonsVisited(
-                                        information = it.information.value,
-                                        name = it.name.value,
-                                        servey = it.survey.value,
-                                        subject = it.subject.value,
+                                        information = person.information.value,
+                                        name = person.name.value,
+                                        servey = person.survey.value,
+                                        subject = person.subject.value,
                                     )
                                 )
                             }
@@ -869,18 +877,20 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     }
                     /* if (birthdayInfo.value.isNotEmpty() && birthdayInfoFile == null && dailyModel == null) {
                          current.toast("Photo Mandatory")
-                     } else*/ if (rationShopInfo.value.isNotEmpty() && rationInfoFile == null && dailyModel == null) {
-                    current.toast("Photo Mandatory")
-                } else if (electricInfo.value.isNotEmpty() && electricInfoFile == null && dailyModel == null) {
-                    current.toast("Photo Mandatory")
-                } /* else if (drinkingWaterInfo.value.isNotEmpty() && drinkingInfoFile == null && dailyModel == null) {
+                     } else
+                      else if (drinkingWaterInfo.value.isNotEmpty() && drinkingInfoFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
-                    } */ else if (waterCanalInfo.value.isNotEmpty() && waterCanalInfoFile == null && dailyModel == null) {
-                    current.toast("Photo Mandatory")
+                    } */
+                if (rationShopInfo.value.isNotEmpty() && rationInfoFile == null && dailyModel == null) {
+                    current.toast(current.getString(R.string.ration_info)+" Photo Mandatory")
+                } else if (electricInfo.value.isNotEmpty() && electricInfoFile == null && dailyModel == null) {
+                    current.toast(current.getString(R.string.electric_info)+" Photo Mandatory")
+                }  else if (waterCanalInfo.value.isNotEmpty() && waterCanalInfoFile == null && dailyModel == null) {
+                    current.toast(current.getString(R.string.water_canal_info)+" Photo Mandatory")
                 } else if (schoolInfo.value.isNotEmpty() && schoolInfoFile == null && dailyModel == null) {
-                    current.toast("Photo Mandatory")
+                    current.toast(current.getString(R.string.school_info)+" Photo Mandatory")
                 } else if (prathamikInfo.value.isNotEmpty() && primaryHealthInfoFile == null && dailyModel == null) {
-                    current.toast("Photo Mandatory")
+                    current.toast(current.getString(R.string.prathamik_info)+" Photo Mandatory")
                 }/*  else if (pashuInfo.value.isNotEmpty() && vetarnityHealthInfoFile == null && dailyModel == null) {
                         current.toast("Photo Mandatory")
                     } else if (govEmpInfo.value.isNotEmpty() && govInfoInfoFile == null) {
@@ -923,7 +933,7 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     if (electricInfoFile != null) {
                         val requestFile =
                             electricInfoFile!!.asRequestBody("image/jpg".toMediaType())
-                        rashanshopinfoBody = MultipartBody.Part.createFormData(
+                        electricInfoFileBody = MultipartBody.Part.createFormData(
                             "electricityinfofile",
                             electricInfoFile!!.name,
                             requestFile
@@ -1126,10 +1136,6 @@ fun showImage(devFile: File, current: Context) {
     current.startActivity(intent)
 }
 
-@Composable
-fun showToast(current: Context) {
-    current.toast("Photo Mandatory")
-}
 
 fun resetErrorFlag(it: PersonVisitedModel) {
     it.isN.value = false
@@ -1219,6 +1225,6 @@ class PersonVisitedModel(val id: String) {
 
 @Composable
 @Preview
-fun addDailyPreview() {
+fun AddDailyPreview() {
     AddDailyVisit("0", null)
 }

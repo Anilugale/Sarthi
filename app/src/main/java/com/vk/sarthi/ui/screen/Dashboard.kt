@@ -105,11 +105,11 @@ fun Dashboard(
             VillageState.Success -> {
 
                 Cache.storeVillageData(LocalContext.current)
-                Box(modifier = Modifier.fillMaxSize().padding(it), contentAlignment = Alignment.Center) {
+                Box(modifier = Modifier.fillMaxSize().padding(it)) {
                     if (Cache.villageData != null) {
                         LazyColumn(
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .fillMaxSize()
                                 .wrapContentHeight(), horizontalAlignment = Alignment.Start
                         ) {
                             items(Cache.villageData!!.villages.size, key = { it }) {
