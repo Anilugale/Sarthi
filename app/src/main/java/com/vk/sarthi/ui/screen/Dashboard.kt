@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.vk.sarthi.WifiService
 import com.vk.sarthi.cache.Cache
 import com.vk.sarthi.model.Village
 import com.vk.sarthi.ui.nav.Screens
@@ -37,8 +38,8 @@ import com.vk.sarthi.ui.theme.FontColor2
 import com.vk.sarthi.ui.theme.Teal200
 import com.vk.sarthi.ui.theme.WindowColor
 import com.vk.sarthi.utli.SettingPreferences
-import com.vk.sarthi.utli.Util
 import com.vk.sarthi.viewmodel.MainViewModel
+import com.vk.sarthi.viewmodel.SyncState
 import com.vk.sarthi.viewmodel.VillageState
 import kotlinx.coroutines.launch
 
@@ -55,6 +56,32 @@ fun Dashboard(
     val activityViewModel: MainViewModel = hiltViewModel()
     val modeVM = remember {
         activityViewModel
+    }
+    if((Cache.isOfflineOfficeWork(context) || Cache.isOfflineDailyVisit(context)) && WifiService.instance.isOnline() ) {
+        LaunchedEffect(true ){
+            activityViewModel.sendOffLineData()
+        }
+
+    }
+    val syncValue = modeVM.syncStateExpose.collectAsState().value
+    val showProgressDialog  = remember {
+        mutableStateOf(false)
+    }
+    when (syncValue) {
+        is SyncState.Failed -> {
+            showProgressDialog.value = false
+        }
+        SyncState.Processing -> {
+            showProgressDialog.value = true
+        }
+        SyncState.Success -> {
+            Cache.clearOfflineOfficeWork(context)
+            Cache.clearOfflineODailyVisit(context)
+            showProgressDialog.value = false
+        }
+    }
+    if (showProgressDialog.value) {
+        ShowProgressDialog("Sending offline data....")
     }
 
     val value = modeVM.stateExpose.collectAsState().value
@@ -93,24 +120,30 @@ fun Dashboard(
 
         when (value) {
             VillageState.Empty -> {
-                Box(modifier = Modifier.fillMaxSize().padding(it)) {
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it)) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
             }
             is VillageState.Failed -> {
-                Box(modifier = Modifier.fillMaxSize().padding(it)) {
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it)) {
                     Text(text = value.msg, Modifier.align(Alignment.Center))
                 }
             }
             VillageState.Success -> {
 
                 Cache.storeVillageData(LocalContext.current)
-                Box(modifier = Modifier.fillMaxSize().padding(it)) {
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it),) {
                     if (Cache.villageData != null) {
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .wrapContentHeight(), horizontalAlignment = Alignment.Start
+                                .fillMaxSize()
                         ) {
                             items(Cache.villageData!!.villages.size, key = { it }) {
                                 ShowVillageItem(Cache.villageData!!.villages[it])
@@ -277,8 +310,10 @@ fun ShowDetails(it: Village, current: Context, function: () -> Unit) {
                     modifier = Modifier
                         .width(80.dp)
                         .height(2.dp)
-                        .background(color = Color.Gray, shape = RoundedCornerShape(5.dp)
-                        ).align(CenterHorizontally)
+                        .background(
+                            color = Color.Gray, shape = RoundedCornerShape(5.dp)
+                        )
+                        .align(CenterHorizontally)
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
@@ -320,8 +355,10 @@ fun ShowDetails(it: Village, current: Context, function: () -> Unit) {
                     modifier = Modifier
                         .width(80.dp)
                         .height(2.dp)
-                        .background(color = Color.Gray, shape = RoundedCornerShape(5.dp)
-                        ).align(CenterHorizontally)
+                        .background(
+                            color = Color.Gray, shape = RoundedCornerShape(5.dp)
+                        )
+                        .align(CenterHorizontally)
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
@@ -363,8 +400,10 @@ fun ShowDetails(it: Village, current: Context, function: () -> Unit) {
                     modifier = Modifier
                         .width(80.dp)
                         .height(2.dp)
-                        .background(color = Color.Gray, shape = RoundedCornerShape(5.dp)
-                        ).align(CenterHorizontally)
+                        .background(
+                            color = Color.Gray, shape = RoundedCornerShape(5.dp)
+                        )
+                        .align(CenterHorizontally)
                 )
                 Spacer(modifier = Modifier.height(5.dp))
 
@@ -409,8 +448,10 @@ fun ShowDetails(it: Village, current: Context, function: () -> Unit) {
                     modifier = Modifier
                         .width(80.dp)
                         .height(2.dp)
-                        .background(color = Color.Gray, shape = RoundedCornerShape(5.dp)
-                        ).align(CenterHorizontally)
+                        .background(
+                            color = Color.Gray, shape = RoundedCornerShape(5.dp)
+                        )
+                        .align(CenterHorizontally)
                 )
                 Spacer(modifier = Modifier.height(5.dp))
                 Text(text = "माहिती",

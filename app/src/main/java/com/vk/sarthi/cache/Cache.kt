@@ -7,10 +7,14 @@ import com.google.gson.reflect.TypeToken
 import com.vk.sarthi.model.*
 import com.vk.sarthi.utli.SettingPreferences
 import com.vk.sarthi.viewmodel.OfficeWorkOfflineModel
+import com.vk.sarthi.viewmodel.VisitOffLineModel
 
 object Cache {
-    const val OFFICE_OFFLINE_LIST = "Office_Offline_List"
-    val gson = Gson()
+    private const val OFFICE_OFFLINE_LIST = "Office_Offline_List"
+    private const val DAILY_OFFLINE_LIST = "Daily_Offline_List"
+    private val gson = Gson()
+    var villageData: VillageData? = null
+
     fun getComplaintFromID(id: Int):ComplaintModel? {
         return try {
                   commentList.single { it.ticket_id == id }
@@ -68,6 +72,15 @@ object Cache {
         list.add(officeWorkOfflineModel)
         pref.edit().putString(OFFICE_OFFLINE_LIST,gson.toJson(list)).apply()
     }
+    fun removeOfficeWork(removeItems: OfficeWorkOfflineModel, pref: SharedPreferences) {
+        val stringData = pref.getString(OFFICE_OFFLINE_LIST, null)
+        var officeWorkOfflineList = ArrayList<OfficeWorkOfflineModel>()
+        if (stringData != null) {
+            officeWorkOfflineList = gson.fromJson(stringData, object :TypeToken<ArrayList<OfficeWorkOfflineModel>>(){}.type )
+        }
+        officeWorkOfflineList.remove(removeItems)
+        pref.edit().putString(OFFICE_OFFLINE_LIST,gson.toJson(officeWorkOfflineList)).apply()
+    }
 
     var officeWorkOfflineList = arrayListOf<OfficeWorkOfflineModel>()
     fun isOfflineOfficeWork(current:Context):Boolean{
@@ -86,5 +99,46 @@ object Cache {
         pref.edit().putString(OFFICE_OFFLINE_LIST,gson.toJson(list)).apply()
     }
 
-    var villageData: VillageData? = null
+
+    var dailyVisitOfflineList = arrayListOf<VisitOffLineModel>()
+    fun addDailyVisitOffline(
+        pref: SharedPreferences,
+        model: VisitOffLineModel
+    ) {
+        val stringData = pref.getString(DAILY_OFFLINE_LIST, null)
+        var list = ArrayList<VisitOffLineModel>()
+        if (stringData != null) {
+            list = gson.fromJson(stringData, object :TypeToken<ArrayList<VisitOffLineModel>>(){}.type )
+        }
+        list.add(model)
+        pref.edit().putString(DAILY_OFFLINE_LIST,gson.toJson(list)).apply()
+    }
+
+
+    fun isOfflineDailyVisit(current:Context):Boolean{
+        val pref = SettingPreferences.get(current)
+        val stringData = pref.getString(DAILY_OFFLINE_LIST, null)
+        dailyVisitOfflineList = ArrayList()
+        if (stringData != null) {
+            dailyVisitOfflineList = gson.fromJson(stringData, object :TypeToken<ArrayList<VisitOffLineModel>>(){}.type )
+        }
+        return dailyVisitOfflineList.isNotEmpty()
+    }
+
+    fun clearOfflineODailyVisit(current: Context) {
+        val pref = SettingPreferences.get(current)
+        val list = ArrayList<VisitOffLineModel>()
+        pref.edit().putString(DAILY_OFFLINE_LIST,gson.toJson(list)).apply()
+    }
+    fun removeDailyVisit(removeItems: VisitOffLineModel, pref: SharedPreferences) {
+        val stringData = pref.getString(DAILY_OFFLINE_LIST, null)
+        var dailyVisitOfflineList = ArrayList<VisitOffLineModel>()
+        if (stringData != null) {
+            dailyVisitOfflineList = gson.fromJson(stringData, object :TypeToken<ArrayList<VisitOffLineModel>>(){}.type )
+        }
+        dailyVisitOfflineList.remove(removeItems)
+        pref.edit().putString(DAILY_OFFLINE_LIST,gson.toJson(dailyVisitOfflineList)).apply()
+    }
+
+
 }

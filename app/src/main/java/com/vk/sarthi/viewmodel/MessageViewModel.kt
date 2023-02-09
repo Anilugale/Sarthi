@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.vk.sarthi.WifiService
 import com.vk.sarthi.cache.Cache
 import com.vk.sarthi.model.ComplaintReq
+import com.vk.sarthi.model.CoordinatoridMode
 import com.vk.sarthi.service.Service
 import com.vk.sarthi.utli.Constants
 import com.vk.sarthi.utli.com.vk.sarthi.model.MessageModel
@@ -27,7 +28,7 @@ class MessageViewModel @Inject constructor(private val service: Service) : ViewM
     private fun getVillageList() {
         if (WifiService.instance.isOnline()) {
             viewModelScope.launch {
-                val msgList = service.getMsgList(ComplaintReq(Cache.loginUser!!.id))
+                val msgList = service.getMsgList(CoordinatoridMode(Cache.loginUser!!.id))
                 if (msgList.isSuccessful && msgList.body() != null) {
                     if (msgList.body()!!.status == 200) {
                         state.value = MsgListStatus.SuccessMsgList(msgList.body()!!.data)

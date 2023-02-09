@@ -351,7 +351,7 @@ class ComplaintViewModel @Inject constructor(private val service: Service) : Vie
 
                 state.value = Status.Process
                 viewModelScope.launch(Dispatchers.IO) {
-                    val commentList = service.getComplaintList(ComplaintReq(Cache.loginUser!!.id))
+                    val commentList = service.getComplaintList(CoordinatoridMode(Cache.loginUser!!.id))
 
                     viewModelScope.launch(Dispatchers.Main) {
                         try {

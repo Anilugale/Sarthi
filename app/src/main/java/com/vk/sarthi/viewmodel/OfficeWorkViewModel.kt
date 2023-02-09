@@ -1,5 +1,6 @@
 package com.vk.sarthi.viewmodel
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vk.sarthi.WifiService
@@ -31,34 +32,38 @@ class OfficeWorkViewModel @Inject constructor(private val service: Service) : Vi
 
     private var synchState: MutableStateFlow<Status> = MutableStateFlow(Status.Empty)
     val synchStateExpose = synchState.asStateFlow()
-
-    fun getList() {
-        if (Cache.officeWorkModelList.isEmpty()) {
+    val isFooter = mutableStateOf(true)
+    fun getList(isFromPagination:Boolean) {
+        if (Cache.officeWorkModelList.isEmpty() || isFromPagination) {
             viewModelScope.launch {
                 if (WifiService.instance.isOnline()) {
-                    state.value = Status.Process
-                    val response = service.getOfficeWorkList(ComplaintReq(Cache.loginUser!!.id))
-
-                    viewModelScope.launch(Dispatchers.Main) {
-                        if (response.isSuccessful && response.body() != null) {
-                            Cache.officeWorkModelList.addAll(response.body()!!.data)
-                            if (Cache.officeWorkModelList.isEmpty()) {
-                                state.value = Status.Empty
-                            } else {
-                                Cache.officeWorkModelList.reverse()
-                                state.value = Status.SuccessOffice(Cache.officeWorkModelList, false)
-                            }
-
-                        } else {
-                            if (response.body() != null) {
-                                state.value = Status.Error(response.body()!!.messages)
-                            } else {
-                                state.value = Status.Error(Constants.Error)
-                            }
-                        }
-
+                    val i = Cache.officeWorkModelList.size / Constants.PageSize
+                    if (isFromPagination) {
+                        delay(500)
+                    }else{
+                        state.value = Status.Process
                     }
-                }else{
+                    val response = service.getOfficeWorkList(ComplaintReq(Cache.loginUser!!.id, i.inc()))
+                    if (response.isSuccessful && response.body() != null) {
+                        val data = response.body()!!.data
+                        isFooter.value = data.size >= Constants.PageSize
+                        if (isFromPagination) {
+                            state.value = Status.Empty
+                        }
+                        Cache.officeWorkModelList.addAll(data)
+                        if (Cache.officeWorkModelList.isEmpty()) {
+                            state.value = Status.Empty
+                        } else {
+                            state.value = Status.SuccessOffice(Cache.officeWorkModelList, false)
+                        }
+                    } else {
+                        if (response.body() != null) {
+                            state.value = Status.Error(response.body()!!.messages)
+                        } else {
+                            state.value = Status.Error(Constants.Error)
+                        }
+                    }
+                } else {
                     state.value = Status.Error(Constants.NO_INTERNET)
                 }
             }

@@ -9,14 +9,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -34,10 +32,8 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.vk.sarthi.R
-import com.vk.sarthi.WifiService
 import com.vk.sarthi.cache.Cache
 import com.vk.sarthi.model.DailyVisitModel
-import com.vk.sarthi.model.Village
 import com.vk.sarthi.ui.nav.BottomNavigationBar
 import com.vk.sarthi.ui.nav.Screens
 import com.vk.sarthi.ui.theme.FontColor2
@@ -55,6 +51,7 @@ fun DailyVisit(navigatorController: NavHostController?) {
     val fabVisibility by derivedStateOf {
         listState.firstVisibleItemIndex == 0
     }
+    val lazyState = rememberLazyListState()
     val activityViewModel: MainViewModel = hiltViewModel()
     activityViewModel.getVillageList()
     val context = LocalContext.current
@@ -135,7 +132,8 @@ fun DailyVisit(navigatorController: NavHostController?) {
         val targetState = viewModel.stateExpose.collectAsState().value
 
         LaunchedEffect(key1 = Cache.dailyVisitList) {
-            model.getDailyVisitList()
+            Cache.dailyVisitList.clear()
+            model.getDailyVisitList(isFromPagination = false)
         }
         val swipeRefreshState = rememberSwipeRefreshState(false)
         Box(modifier = Modifier.padding(paddingValues = it)) {
@@ -156,7 +154,8 @@ fun DailyVisit(navigatorController: NavHostController?) {
                         targetState.list,
                         navigatorController,
                         model,
-                        swipeRefreshState
+                        swipeRefreshState,
+                        lazyState
                     )
 
                 }
@@ -223,20 +222,29 @@ fun ShowDailyList(
     navigatorController: NavHostController?,
     model: DailyVisitVM,
     swipeRefreshState: SwipeRefreshState,
+    lazyState: LazyListState,
 ) {
 
-    val lazyState = rememberLazyListState()
+
 
     SwipeRefresh(
         state = swipeRefreshState,
         onRefresh = {
             swipeRefreshState.isRefreshing = true
-            model.getDailyVisitList(true)
+            model.getDailyVisitList(true,true)
         },
     ) {
         LazyColumn(contentPadding = PaddingValues(5.dp), state = lazyState) {
             items(count = list.size, key = { it }) {
                 ShowDailyItem(list[it], navigatorController)
+            }
+            if(model.isFooter.value){
+                item {
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+                        CircularProgressIndicator()
+                        model.getDailyVisitList(isFromPagination = true)
+                    }
+                }
             }
         }
     }

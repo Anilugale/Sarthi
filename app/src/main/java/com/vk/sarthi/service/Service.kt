@@ -11,7 +11,7 @@ import retrofit2.http.*
 interface Service {
 
     @POST(Constants.getcoordinatorcomplaints)
-    suspend fun getComplaintList(@Body req:ComplaintReq): Response<ComplaintResponse>
+    suspend fun getComplaintList(@Body req:CoordinatoridMode): Response<ComplaintResponse>
 
     @POST(Constants.loginUrl)
     suspend fun loginUrl(@Body req: LoginReq): Response<LoginResponse>
@@ -86,5 +86,5 @@ interface Service {
     suspend fun sendYojna(@Body model: YojsnaPostReq): Response<YojnaResponse>
 
     @POST("api/getcoordinatormsglist")
-    suspend fun getMsgList(@Body complaintReq: ComplaintReq): Response<MessageListResponse>
+    suspend fun getMsgList(@Body complaintReq: CoordinatoridMode): Response<MessageListResponse>
 }

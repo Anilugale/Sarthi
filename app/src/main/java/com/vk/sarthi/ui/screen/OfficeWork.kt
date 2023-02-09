@@ -64,7 +64,7 @@ fun OfficeWork(navigatorController: NavHostController?) {
     val viewModel = remember { model }
 
     val syncState = model.synchStateExpose.collectAsState().value
-    var showProgressDialog  = remember {
+    val showProgressDialog  = remember {
         mutableStateOf(false)
     }
     when (syncState) {
@@ -79,7 +79,7 @@ fun OfficeWork(navigatorController: NavHostController?) {
         }
     }
     if (showProgressDialog.value) {
-        ShowProgressDialog()
+        ShowProgressDialog("Sending offline data....")
     }
     Scaffold(
         scaffoldState = scaffoldState,
@@ -164,7 +164,8 @@ fun ShowOfficeListUI(
 
 
     LaunchedEffect(key1 = Cache.officeWorkModelList) {
-        model.getList()
+        Cache.officeWorkModelList.clear()
+        model.getList(false)
     }
 
     when (targetState) {
@@ -356,6 +357,15 @@ fun ShowListOffice(
                     WorkDailyUI(model, clickID, modalBottomSheetState, coroutineScope)
                 }
             }
+            if(model.isFooter.value){
+                item {
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+                        CircularProgressIndicator(modifier = Modifier.padding(10.dp))
+                        model.getList(true)
+                    }
+                }
+            }
+
         }
 
     }

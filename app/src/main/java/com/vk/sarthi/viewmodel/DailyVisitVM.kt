@@ -1,5 +1,6 @@
 package com.vk.sarthi.viewmodel
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vk.sarthi.WifiService
@@ -9,6 +10,7 @@ import com.vk.sarthi.service.Service
 import com.vk.sarthi.utli.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -20,37 +22,53 @@ class DailyVisitVM @Inject constructor(val service: Service) : ViewModel() {
     private var state: MutableStateFlow<DailyVisitStateList> = MutableStateFlow(DailyVisitStateList.Empty)
     val stateExpose = state.asStateFlow()
 
-    init {
-        getDailyVisitList()
-    }
-    fun getDailyVisitList(isFromRefresh:Boolean= false) {
+    val isFooter = mutableStateOf(true)
+
+    fun getDailyVisitList(isFromRefresh:Boolean= false,isFromPagination:Boolean) {
         if (!isFromRefresh) {
-            state.value = DailyVisitStateList.Process
+            isFooter.value = true
+            if (!isFromPagination) {
+                state.value = DailyVisitStateList.Process
+            }
         }
         viewModelScope.launch{
-            if (WifiService.instance.isOnline()) {
-                val response = service.getDailyVisitListFetch(ComplaintReq(Cache.loginUser!!.id))
-                viewModelScope.launch(Dispatchers.Main) {
-                    if (response.isSuccessful) {
-                        if (response.body() != null) {
-                            val data = response.body()!!.data
-                            Cache.dailyVisitList.clear()
-                            if (data.isEmpty()) {
-                                state.value = DailyVisitStateList.Empty
-                            } else {
-                                Cache.dailyVisitList.addAll(response.body()!!.data)
-                                state.value = DailyVisitStateList.Success(Cache.dailyVisitList)
-                            }
-
-                        } else {
-                            state.value = DailyVisitStateList.Failed(response.message())
-                        }
-                    } else {
-                        state.value = DailyVisitStateList.Failed("Server Error")
+            if(Cache.dailyVisitList.isEmpty() || isFromPagination) {
+                if (WifiService.instance.isOnline()) {
+                    val i = Cache.dailyVisitList.size / Constants.PageSize
+                    if (isFromPagination) {
+                        delay(500)
                     }
+
+                    val response =
+                        service.getDailyVisitListFetch(ComplaintReq(Cache.loginUser!!.id, i.inc()))
+                    viewModelScope.launch(Dispatchers.Main) {
+                        if (response.isSuccessful) {
+                            if (response.body() != null) {
+                                val data1 = response.body()!!.data
+                                val data = data1
+                                if (isFromRefresh) {
+                                    Cache.dailyVisitList.clear()
+                                }
+                                if (data.isEmpty() && (Cache.dailyVisitList.isEmpty() && !isFromRefresh)) {
+                                    state.value = DailyVisitStateList.Empty
+                                } else {
+                                    isFooter.value = data1.size >= Constants.PageSize
+                                    Cache.dailyVisitList.addAll(data1)
+                                    state.value = DailyVisitStateList.Success(Cache.dailyVisitList)
+                                }
+
+                            } else {
+                                state.value = DailyVisitStateList.Failed(response.message())
+                            }
+                        } else {
+                            state.value = DailyVisitStateList.Failed("Server Error")
+                        }
+                    }
+                } else {
+                    state.value = DailyVisitStateList.Failed(Constants.NO_INTERNET)
                 }
             }else{
-                state.value = DailyVisitStateList.Failed(Constants.NO_INTERNET)
+                state.value = DailyVisitStateList.Success(Cache.dailyVisitList)
             }
         }
     }

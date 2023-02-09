@@ -75,7 +75,7 @@ fun DailyVisitDetailsUI(workID: String, navigatorController: NavHostController?)
                             modifier = Modifier
                                 .padding(10.dp)
                                 .clickable {
-                                    navigatorController!!.navigate(Screens.AddDailyVisit.route + "/" + dailyModel!!.id)
+                                    navigatorController!!.navigate(Screens.AddDailyVisit.route + "/" + dailyModel.id)
                                 }
                         )
 
@@ -144,7 +144,7 @@ fun DailyVisitDetailsUI(workID: String, navigatorController: NavHostController?)
     val value = viewModel.stateExpose.collectAsState().value
 
     if (showDialog.value) {
-        showDelete(showDialog, dailyModel, model)
+        ShowDelete(showDialog, dailyModel, model)
     }
 
     when (value) {
@@ -217,7 +217,7 @@ fun PersonVisitedDetailsUI(titleColor: Color, personsVisited: List<PersonsVisite
 private fun ShowInfo(
     msg: String?,
     placeholderID :Int,
-    attachmentUrl :String,
+    attachmentUrl :String?,
     titleColor: Color
 ) {
     val current = LocalContext.current
@@ -237,33 +237,36 @@ private fun ShowInfo(
             fontSize = 16.sp
         )
 
-        Row(
-            modifier = Modifier
-                .padding(vertical = 5.dp)
-                .clickable {
-                    val url = "https://shirdiyuva.in/${attachmentUrl}"
-                    Log.d("@@", "ShowCommentItem: $url")
-                    val intent = Intent().apply {
-                        action = Intent.ACTION_VIEW
-                        data = Uri.parse(url)
+        if (attachmentUrl!=null && attachmentUrl.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .padding(vertical = 5.dp)
+                    .clickable {
+                        val url = "https://shirdiyuva.in/${attachmentUrl}"
+                        Log.d("@@", "ShowCommentItem: $url")
+                        val intent = Intent().apply {
+                            action = Intent.ACTION_VIEW
+                            data = Uri.parse(url)
+                        }
+                        current.startActivity(intent)
                     }
-                    current.startActivity(intent)
-                }
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Attachment,
-                contentDescription = "attachment",
-                tint = FontColor2
-            )
-            Text(
-                text = "Attachment", modifier = Modifier
-                    .padding(horizontal = 5.dp)
-                    .align(Alignment.CenterVertically),
-                fontSize = 12.sp,
-                textAlign = TextAlign.Center,
-                color = FontColor2
-            )
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Attachment,
+                    contentDescription = "attachment",
+                    tint = FontColor2
+                )
+                Text(
+                    text = "Attachment", modifier = Modifier
+                        .padding(horizontal = 5.dp)
+                        .align(Alignment.CenterVertically),
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center,
+                    color = FontColor2
+                )
+            }
         }
+
 
     }
 
@@ -271,7 +274,7 @@ private fun ShowInfo(
 
 
 @Composable
-fun showDelete(
+fun ShowDelete(
     showDialog: MutableState<Boolean>,
     dailyModel: DailyVisitModel?,
     model: DailyVisitVM

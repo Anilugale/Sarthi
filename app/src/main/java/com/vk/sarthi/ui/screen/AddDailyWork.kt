@@ -61,6 +61,7 @@ fun AddDailyWork(workID:String,navigatorController: NavHostController?) {
                     cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
                 cursor.moveToFirst()
                 fileSize.value = cursor.getLong(cursor.getColumnIndex(OpenableColumns.SIZE))
+                fileSize.value = cursor.getLong(cursor.getColumnIndex(OpenableColumns.SIZE))
                 cursor.close()
                 if (Util.checkForFileSize(fileSize.value)) {
                     val fileInputStream =

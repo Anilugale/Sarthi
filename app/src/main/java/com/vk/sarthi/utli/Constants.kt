@@ -42,5 +42,6 @@ object Constants {
     const val BIRTHDAY_INFO = "BIRTHDAY_INFO"
     const val YOJNA_INFO_INFO = "YOJNA_INFO_INFO"
     const val OTHER_INFO = "OTHER_INFO"
+    const val PageSize = 100
     // https://shirdiyuva.in/
 }
