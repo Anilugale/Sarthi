@@ -46,6 +46,7 @@ import com.vk.sarthi.ui.theme.FontColor2
 import com.vk.sarthi.utli.*
 import com.vk.sarthi.viewmodel.AddDailyVisitVM
 import com.vk.sarthi.viewmodel.DailyVisitState
+import com.vk.sarthi.viewmodel.PersonVisitedModel
 import id.zelory.compressor.Compressor
 import id.zelory.compressor.constraint.quality
 import kotlinx.coroutines.launch
@@ -350,9 +351,26 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
             }
 
+          val personDataValue = arrayListOf<Array<MutableState<String>>>()
 
-            personVisitedList.forEach {model->
-                PersonVisitedUI(model = model, labelColor, personVisitedList, (dailyModel == null))
+            personVisitedList.forEachIndexed { _, model->
+
+                val name = remember {
+                    model.name
+                }
+
+                val subject = remember {
+                    model.subject
+                }
+                val survey = remember {
+                    model.survey
+                }
+                val information = remember {
+                    model.information
+                }
+                val data = arrayOf(name,subject,survey,information)
+                personDataValue.add(data)
+                PersonVisitedUI(model = model, labelColor, personVisitedList, (dailyModel == null),name,subject,survey,information)
             }
 
 
@@ -810,29 +828,30 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                         return@Button
                     }
                     val personalList = arrayListOf<PersonsVisited>()
-                    personVisitedList.forEach { person->
+                    personDataValue.forEachIndexed { index,person->
+
                         Log.d("@@", "AddDailyVisit: $person")
-                        resetErrorFlag(person)
-                        if (person.name.value.isNotEmpty() || person.subject.value.isNotEmpty() || person.information.value.isNotEmpty() || person.survey.value.isNotEmpty()) {
-                            if (person.name.value.isEmpty()) {
-                                person.isN.value = true
+                        resetErrorFlag(   personVisitedList[index])
+                        if (person[0].value.isNotEmpty() || person[1].value.isNotEmpty() ||  person[2].value.isNotEmpty() || person[3].value.isNotEmpty()) {
+                            if (person[0].value.isEmpty()) {
+                                personVisitedList[index].isN.value = true
                                 return@Button
-                            } else if (person.subject.value.isEmpty()) {
-                                person.isS.value = true
+                            } else if (person[1].value.isEmpty()) {
+                                personVisitedList[index].isS.value = true
                                 return@Button
-                            } else if (person.information.value.isEmpty()) {
-                                person.isIn.value = true
+                            } else if (person[3].value.isEmpty()) {
+                                personVisitedList[index].isIn.value = true
                                 return@Button
-                            } else if (person.survey.value.isEmpty()) {
-                                person.isSu.value = true
+                            } else if (person[2].value.isEmpty()) {
+                                personVisitedList[index].isSu.value = true
                                 return@Button
                             } else {
                                 personalList.add(
                                     PersonsVisited(
-                                        information = person.information.value,
-                                        name = person.name.value,
-                                        servey = person.survey.value,
-                                        subject = person.subject.value,
+                                        information = person[3].value,
+                                        name = person[0].value,
+                                        servey = person[2].value,
+                                        subject = person[1].value,
                                     )
                                 )
                             }
@@ -973,7 +992,11 @@ fun PersonVisitedUI(
     model: PersonVisitedModel,
     labelColor: Color,
     personVisitedList: SnapshotStateList<PersonVisitedModel>,
-    isAddNew: Boolean
+    isAddNew: Boolean,
+    name: MutableState<String>,
+    subject: MutableState<String>,
+    survey: MutableState<String>,
+    information: MutableState<String>
 ) {
     Column(
         modifier = Modifier
@@ -1001,31 +1024,32 @@ fun PersonVisitedUI(
 
 
 
+
         OutlinedTextField(
-            value = model.name.value,
-            onValueChange = { model.name.value = it },
+            value = name.value,
+            onValueChange = { name.value = it },
             label = { Text(text = stringResource(R.string.name)) },
             modifier = Modifier.fillMaxWidth(),
             isError = model.isN.value,
 
             )
         OutlinedTextField(
-            value = model.subject.value,
-            onValueChange = { model.subject.value = it },
+            value = subject.value,
+            onValueChange = { subject.value = it },
             label = { Text(text = stringResource(R.string.subject)) },
             modifier = Modifier.fillMaxWidth(),
             isError = model.isS.value
         )
         OutlinedTextField(
-            value = model.information.value,
-            onValueChange = { model.information.value = it },
+            value = information.value,
+            onValueChange = { information.value = it },
             label = { Text(text = stringResource(R.string.info)) },
             modifier = Modifier.fillMaxWidth(),
             isError = model.isIn.value
         )
         OutlinedTextField(
-            value = model.survey.value,
-            onValueChange = { model.survey.value = it },
+            value = survey.value,
+            onValueChange = { survey.value = it },
             label = { Text(text = stringResource(R.string.survey)) },
             modifier = Modifier.fillMaxWidth(),
             isError = model.isSu.value
@@ -1034,17 +1058,7 @@ fun PersonVisitedUI(
     }
 }
 
-class PersonVisitedModel(val id: String) {
-    var name = mutableStateOf("")
-    var subject = mutableStateOf("")
-    var information = mutableStateOf("")
-    var survey = mutableStateOf("")
 
-    var isN = mutableStateOf(false)
-    var isS = mutableStateOf(false)
-    var isIn = mutableStateOf(false)
-    var isSu = mutableStateOf(false)
-}
 
 
 @Composable

@@ -1,6 +1,8 @@
 package com.vk.sarthi.viewmodel
 
 import android.content.SharedPreferences
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vk.sarthi.WifiService
@@ -26,6 +28,10 @@ import javax.inject.Inject
 class AddDailyVisitVM @Inject constructor(val service: Service, private val pref: SharedPreferences) : ViewModel() {
     private var state: MutableStateFlow<DailyVisitState> = MutableStateFlow(DailyVisitState.Empty)
     val stateExpose = state.asStateFlow()
+    private val personVisitedList = mutableStateListOf<PersonVisitedModel>()
+    init {
+        personVisitedList.add(PersonVisitedModel("1"))
+    }
 
     fun setDailyVisitReq(
         visitid: Int,
@@ -272,6 +278,9 @@ class AddDailyVisitVM @Inject constructor(val service: Service, private val pref
             state.value = DailyVisitState.Success("Save OffLine")
         }
     }
+
+
+
 }
 data class VisitOffLineModel(
     val hashMap: HashMap<String, String>,
@@ -296,4 +305,17 @@ sealed class DailyVisitState {
     object Process : DailyVisitState()
     object Empty : DailyVisitState()
     class Failed(val msg:String) : DailyVisitState()
+}
+
+
+class PersonVisitedModel(val id: String) {
+    var name = mutableStateOf("")
+    var subject = mutableStateOf("")
+    var information = mutableStateOf("")
+    var survey = mutableStateOf("")
+
+    var isN = mutableStateOf(false)
+    var isS = mutableStateOf(false)
+    var isIn = mutableStateOf(false)
+    var isSu = mutableStateOf(false)
 }
