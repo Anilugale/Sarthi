@@ -75,8 +75,6 @@ fun Dashboard(
             showProgressDialog.value = true
         }
         SyncState.Success -> {
-            Cache.clearOfflineOfficeWork(context)
-            Cache.clearOfflineODailyVisit(context)
             showProgressDialog.value = false
         }
     }

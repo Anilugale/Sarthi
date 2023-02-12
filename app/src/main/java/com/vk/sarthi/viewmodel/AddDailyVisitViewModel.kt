@@ -78,7 +78,7 @@ class AddDailyVisitViewModel @Inject constructor(private val service: Service,va
                usermobileno = Cache.loginUser!!.mobileno,
                filePath = if(file!=null){file.path}else{""}
            ))
-           state.value = WorkState.Success("Save Offline")
+           state.value = WorkState.Success(Constants.SAVE_OFFLINE)
         }
 
     }

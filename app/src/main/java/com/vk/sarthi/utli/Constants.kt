@@ -3,6 +3,7 @@ package com.vk.sarthi.utli
 object Constants {
 
     const val Error: String = "Server Error"
+    const val SAVE_OFFLINE: String = "Saved in phone due to no internet, please connect to internet to sync to Portal"
     const val NO_INTERNET: String = "No Internet Connection"
     const val comment_url = "/comments"
     const val loginUrl = "api/coordinatorlogin"

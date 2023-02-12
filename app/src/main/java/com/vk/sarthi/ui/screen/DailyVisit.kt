@@ -5,12 +5,14 @@ import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -41,6 +43,7 @@ import com.vk.sarthi.ui.theme.WindowColor
 import com.vk.sarthi.viewmodel.DailyVisitStateList
 import com.vk.sarthi.viewmodel.DailyVisitVM
 import com.vk.sarthi.viewmodel.MainViewModel
+import com.vk.sarthi.viewmodel.VisitOffLineModel
 import kotlinx.coroutines.launch
 
 
@@ -82,15 +85,6 @@ fun DailyVisit(navigatorController: NavHostController?) {
                         )
                     }
                 },
-           /*     actions = {
-                    Icon(
-                        imageVector = Icons.Outlined.Logout,
-                        contentDescription = "menu",
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .clickable { showDialog.value = true }
-                    )
-                }*/
             )
         }, drawerContent = { DrawerView(navigatorController, Screens.DailyVisit.route) },
         floatingActionButton = {
@@ -107,11 +101,10 @@ fun DailyVisit(navigatorController: NavHostController?) {
                 )
             ) {
                 FloatingActionButton(onClick = {
-                    if (Cache.villageData==null) {
+                    if (Cache.villageData == null) {
                         Cache.restoreVillageData(context)
-                        context.toast("Offline")
                     }
-                    if (Cache.villageData!=null) {
+                    if (Cache.villageData != null) {
                         navigatorController?.navigate(Screens.AddDailyVisit.route + "/0")
                     }
                 }) {
@@ -123,7 +116,7 @@ fun DailyVisit(navigatorController: NavHostController?) {
             BottomNavigationBar(navController = navigatorController!!)
         },
         backgroundColor = if (isSystemInDarkTheme()) Color.Black else WindowColor
-    ) {
+    ) { it ->
 
         val model: DailyVisitVM = hiltViewModel()
         val viewModel = remember { model }
@@ -161,30 +154,25 @@ fun DailyVisit(navigatorController: NavHostController?) {
                 }
 
                 is DailyVisitStateList.Empty -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(
-                                imageVector = Icons.Outlined.Delete,
-                                modifier = Modifier
-                                    .width(50.dp)
-                                    .height(50.dp),
-                                contentDescription = ""
-                            )
+                    ShowEmptyListDailyVisit()
+                }
 
-                            Spacer(modifier = Modifier.width(5.dp))
-
-                            Text(
-                                text = "No data available",
-                                textAlign = TextAlign.Center
-                            )
+                is DailyVisitStateList.OffLine -> {
+                    if (targetState.list.isEmpty()) {
+                        ShowEmptyListDailyVisit()
+                    } else {
+                        LazyColumn(contentPadding = PaddingValues(5.dp), state = lazyState) {
+                            items(count = targetState.list.size, key = { it }) {
+                                ShowDailyItemOffline(
+                                    targetState.list[it],
+                                )
+                            }
                         }
                     }
 
                 }
-                is DailyVisitStateList.Failed->{
+
+                is DailyVisitStateList.Failed -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -217,6 +205,31 @@ fun DailyVisit(navigatorController: NavHostController?) {
 }
 
 @Composable
+fun ShowEmptyListDailyVisit() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = Icons.Outlined.Delete,
+                modifier = Modifier
+                    .width(50.dp)
+                    .height(50.dp),
+                contentDescription = ""
+            )
+
+            Spacer(modifier = Modifier.width(5.dp))
+
+            Text(
+                text = "No data available",
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
 fun ShowDailyList(
     list: List<DailyVisitModel>,
     navigatorController: NavHostController?,
@@ -226,21 +239,20 @@ fun ShowDailyList(
 ) {
 
 
-
     SwipeRefresh(
         state = swipeRefreshState,
         onRefresh = {
             swipeRefreshState.isRefreshing = true
-            model.getDailyVisitList(true,true)
+            model.getDailyVisitList(true, true)
         },
     ) {
         LazyColumn(contentPadding = PaddingValues(5.dp), state = lazyState) {
             items(count = list.size, key = { it }) {
                 ShowDailyItem(list[it], navigatorController)
             }
-            if(model.isFooter.value){
+            if (model.isFooter.value) {
                 item {
-                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
                         model.getDailyVisitList(isFromPagination = true)
                     }
@@ -257,9 +269,9 @@ fun ShowDailyItem(
     navigatorController: NavHostController?,
 ) {
     if (dailyVisitModel.villagename.isNullOrEmpty()) {
-        dailyVisitModel.villagename  = if(Cache.villageMap[dailyVisitModel.villageid]!=null){
+        dailyVisitModel.villagename = if (Cache.villageMap[dailyVisitModel.villageid] != null) {
             Cache.villageMap[dailyVisitModel.villageid]!!.village
-        }else{
+        } else {
             ""
         }
     }
@@ -280,7 +292,7 @@ fun ShowDailyItem(
                 .padding(10.dp)
         ) {
 
-            if (dailyVisitModel.villagename!=null && dailyVisitModel.villagename.isNotEmpty()) {
+            if (dailyVisitModel.villagename != null && dailyVisitModel.villagename.isNotEmpty()) {
                 Text(
                     text = "गावाचे नाव : ${dailyVisitModel.villagename}",
                     fontSize = 16.sp
@@ -289,7 +301,7 @@ fun ShowDailyItem(
 
             if (dailyVisitModel.persons_visited.isNotEmpty()) {
                 Text(
-                    text = stringResource(R.string.person_visited)+" :- " + dailyVisitModel.persons_visited.size,
+                    text = stringResource(R.string.person_visited) + " :- " + dailyVisitModel.persons_visited.size,
                     fontSize = 14.sp
                 )
                 Spacer(modifier = Modifier.height(5.dp))
@@ -306,6 +318,44 @@ fun ShowDailyItem(
             Text(
                 text = date, fontSize = 12.sp,
                 color = FontColor2
+            )
+        }
+    }
+
+
+}
+
+
+@Composable
+fun ShowDailyItemOffline(
+    dailyVisitModel: VisitOffLineModel,
+) {
+
+    Card(
+        modifier = Modifier
+            .padding(10.dp)
+            .fillMaxWidth()
+    ) {
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+        ) {
+
+            if (dailyVisitModel.villageName.isNotEmpty()) {
+                Text(
+                    text = "गावाचे नाव : ${dailyVisitModel.villageName}",
+                    fontSize = 16.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            Text(
+                text = "Offline Data", fontSize = 12.sp,
+                color = Color.White,
+                modifier = Modifier.background(Color.Gray, shape = RoundedCornerShape(10.dp)).padding(5.dp)
             )
         }
     }

@@ -1,5 +1,6 @@
 package com.vk.sarthi.viewmodel
 
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,6 +10,7 @@ import com.vk.sarthi.model.*
 import com.vk.sarthi.service.Service
 import com.vk.sarthi.utli.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +20,7 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class DailyVisitVM @Inject constructor(val service: Service) : ViewModel() {
+class DailyVisitVM @Inject constructor(val service: Service,@ApplicationContext val context :Context) : ViewModel() {
     private var state: MutableStateFlow<DailyVisitStateList> = MutableStateFlow(DailyVisitStateList.Empty)
     val stateExpose = state.asStateFlow()
 
@@ -65,7 +67,8 @@ class DailyVisitVM @Inject constructor(val service: Service) : ViewModel() {
                         }
                     }
                 } else {
-                    state.value = DailyVisitStateList.Failed(Constants.NO_INTERNET)
+                    Cache.isOfflineDailyVisit(context)
+                    state.value = DailyVisitStateList.OffLine(Constants.NO_INTERNET,Cache.dailyVisitOfflineList)
                 }
             }else{
                 state.value = DailyVisitStateList.Success(Cache.dailyVisitList)
@@ -103,6 +106,7 @@ sealed class DailyVisitStateList {
     object Process : DailyVisitStateList()
     object Empty : DailyVisitStateList()
     class Failed (val msg :String): DailyVisitStateList()
+    class OffLine(val msg: String, val list: ArrayList<VisitOffLineModel>): DailyVisitStateList()
     class SuccessDelete(val msg :String) : DailyVisitStateList()
     class FailedDelete(val msg :String) : DailyVisitStateList()
 }

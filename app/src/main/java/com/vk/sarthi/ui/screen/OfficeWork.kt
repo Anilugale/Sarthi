@@ -45,6 +45,7 @@ import com.vk.sarthi.ui.nav.BottomNavigationBar
 import com.vk.sarthi.ui.nav.Screens
 import com.vk.sarthi.ui.theme.*
 import com.vk.sarthi.utli.Util
+import com.vk.sarthi.viewmodel.OfficeWorkOfflineModel
 import com.vk.sarthi.viewmodel.OfficeWorkViewModel
 import com.vk.sarthi.viewmodel.Status
 import kotlinx.coroutines.CoroutineScope
@@ -204,27 +205,21 @@ fun ShowOfficeListUI(
             isProgressShow.value = false
             Toast.makeText(context, targetState.msg, Toast.LENGTH_SHORT).show()
         }
-
-        is Status.Empty -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(
-                        imageVector = Icons.Outlined.Delete,
-                        modifier = Modifier
-                            .width(50.dp)
-                            .height(50.dp),
-                        contentDescription = ""
-                    )
-
-                    Spacer(modifier = Modifier.width(5.dp))
-
-                    Text(
-                        text = "No Work available",
-                        textAlign = TextAlign.Center
-                    )
+        is Status.OfflineData->{
+            if (targetState.list.isEmpty()) {
+                ShowEmptyListOfOfficeWork()
+            }else{
+                LazyColumn(state = listState) {
+                    items(count = targetState.list.size, key = {it}) {
+                        ShowOfflineOffList(targetState.list[it])
+                        
+                    }
                 }
             }
+        }
 
+        is Status.Empty -> {
+           ShowEmptyListOfOfficeWork()
         }
 
         else -> {
@@ -238,6 +233,51 @@ fun ShowOfficeListUI(
     }
 
 
+}
+
+@Composable
+fun ShowOfflineOffList(officeWorkOfflineModel: OfficeWorkOfflineModel) {
+    Card(modifier = Modifier
+        .padding(10.dp)
+        .fillMaxWidth()
+        .padding(10.dp)
+    ) {
+        Column {
+            Text(text = officeWorkOfflineModel.commentTxt, modifier = Modifier)
+            Spacer(modifier = Modifier.height(5.dp))
+
+            Text(
+                text = "Offline Data", fontSize = 12.sp,
+                color = Color.White,
+                modifier = Modifier
+                    .background(Color.Gray, shape = RoundedCornerShape(10.dp))
+                    .padding(5.dp)
+            )
+        }
+    }
+
+}
+
+@Composable
+fun ShowEmptyListOfOfficeWork() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = Icons.Outlined.Delete,
+                modifier = Modifier
+                    .width(50.dp)
+                    .height(50.dp),
+                contentDescription = ""
+            )
+
+            Spacer(modifier = Modifier.width(5.dp))
+
+            Text(
+                text = "No Work available",
+                textAlign = TextAlign.Center
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)

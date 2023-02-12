@@ -1,5 +1,6 @@
 package com.vk.sarthi.viewmodel
 
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,6 +11,7 @@ import com.vk.sarthi.service.Service
 import com.vk.sarthi.ui.screen.WorkState
 import com.vk.sarthi.utli.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +27,7 @@ import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
-class OfficeWorkViewModel @Inject constructor(private val service: Service) : ViewModel() {
+class OfficeWorkViewModel @Inject constructor(private val service: Service,@ApplicationContext val context: Context) : ViewModel() {
     private var state: MutableStateFlow<Status> = MutableStateFlow(Status.Empty)
     val stateExpose = state.asStateFlow()
 
@@ -64,7 +66,8 @@ class OfficeWorkViewModel @Inject constructor(private val service: Service) : Vi
                         }
                     }
                 } else {
-                    state.value = Status.Error(Constants.NO_INTERNET)
+                    Cache.isOfflineOfficeWork(context)
+                    state.value = Status.OfflineData(Constants.NO_INTERNET,Cache.officeWorkOfflineList)
                 }
             }
         } else {
@@ -160,6 +163,7 @@ sealed interface Status {
 
     data class SuccessUser(val user: UserModel) : Status
     data class SuccessComment(val message:String) : Status
+    data class OfflineData(val message:String,val list :ArrayList<OfficeWorkOfflineModel>) : Status
     object Empty : Status
     data class Error(val error: String) : Status
     data class ErrorLogin(val error: String) : Status

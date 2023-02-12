@@ -275,7 +275,7 @@ class AddDailyVisitVM @Inject constructor(val service: Service, private val pref
                     villageName = village
                 )
             )
-            state.value = DailyVisitState.Success("Save OffLine")
+            state.value = DailyVisitState.Success(Constants.SAVE_OFFLINE)
         }
     }
 
