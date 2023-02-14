@@ -125,6 +125,7 @@ fun DrawerView(navigator: NavHostController?,route :String) {
                 Column(modifier = Modifier.padding(10.dp)) {
                     Text(text = "Name - ${Cache.loginUser!!.name}")
                     Text(text = "Mobile No - ${Cache.loginUser!!.mobileno}", color = FontColor2, fontSize = 12.sp)
+                    Text(text = "App version - ${com.vk.sarthi.BuildConfig.VERSION_NAME}", color = FontColor2, fontSize = 12.sp)
                 }
             }
             DrawerItems(name = "गावाची माहिती", callback = {

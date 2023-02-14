@@ -1,5 +1,6 @@
 package com.vk.sarthi.viewmodel
 
+import android.content.Context
 import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,7 +9,9 @@ import com.vk.sarthi.cache.Cache
 import com.vk.sarthi.model.*
 import com.vk.sarthi.service.Service
 import com.vk.sarthi.utli.Constants
+import com.vk.sarthi.utli.Util
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -59,7 +62,7 @@ class LoginViewModel @Inject constructor(private val service: Service) : ViewMod
 
 
 @HiltViewModel
-class MainViewModel @Inject constructor(private val service: Service,private val pref: SharedPreferences) : ViewModel() {
+class MainViewModel @Inject constructor(private val service: Service,private val pref: SharedPreferences,@ApplicationContext val context :Context) : ViewModel() {
 
 
     private var state: MutableStateFlow<VillageState> = MutableStateFlow(VillageState.Empty)
@@ -112,13 +115,18 @@ class MainViewModel @Inject constructor(private val service: Service,private val
             syncState.value = SyncState.Processing
             if (Cache.officeWorkOfflineList.isNotEmpty()) {
                 isOfficeDataSync = syncData(Cache.officeWorkOfflineList)
+            }else{
+                isOfficeDataSync = Cache.officeWorkOfflineList.isEmpty()
             }
             var isDailyVisitDataSync = false
             if (Cache.dailyVisitOfflineList.isNotEmpty()) {
                 isDailyVisitDataSync = syncDataDaily(Cache.dailyVisitOfflineList)
+            }else{
+                isDailyVisitDataSync = Cache.dailyVisitOfflineList.isEmpty()
             }
 
             if (isOfficeDataSync && isDailyVisitDataSync) {
+                Util.deleteRecursive(context.cacheDir)
                 syncState.value = SyncState.Success
              }else{
                 syncState.value = SyncState.Failed("Not Success")
@@ -316,6 +324,7 @@ class MainViewModel @Inject constructor(private val service: Service,private val
                 )
                 if (response.isSuccessful) {
                     Cache.removeDailyVisit(model,pref)
+                    Cache.dailyVisitOfflineList.remove(model)
                 }
             }
 
@@ -350,6 +359,7 @@ class MainViewModel @Inject constructor(private val service: Service,private val
                 if (response.isSuccessful && response.body() != null) {
                     Cache.officeWorkModelList.add(response.body()!!.data)
                     Cache.removeOfficeWork(it,pref)
+                    Cache.officeWorkOfflineList.remove(it)
                 }else{
                     return false
                 }

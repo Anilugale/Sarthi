@@ -240,19 +240,19 @@ fun ShowOfflineOffList(officeWorkOfflineModel: OfficeWorkOfflineModel) {
     Card(modifier = Modifier
         .padding(10.dp)
         .fillMaxWidth()
-        .padding(10.dp)
+
     ) {
-        Column {
+        Column (modifier = Modifier.padding(10.dp)){
             Text(text = officeWorkOfflineModel.commentTxt, modifier = Modifier)
             Spacer(modifier = Modifier.height(5.dp))
 
-            Text(
+          /*  Text(
                 text = "Offline Data", fontSize = 12.sp,
                 color = Color.White,
                 modifier = Modifier
                     .background(Color.Gray, shape = RoundedCornerShape(10.dp))
                     .padding(5.dp)
-            )
+            )*/
         }
     }
 

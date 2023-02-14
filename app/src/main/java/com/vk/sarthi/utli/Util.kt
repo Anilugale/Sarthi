@@ -2,6 +2,7 @@ package com.vk.sarthi.utli
 
 import android.app.DatePickerDialog
 import android.content.Context
+import android.util.Log
 import android.widget.DatePicker
 import androidx.compose.runtime.MutableState
 import com.vk.sarthi.R
@@ -72,6 +73,17 @@ object Util {
              dateStr.split(" ")[0] == strDate
         }else{
              dateStr == strDate
+        }
+    }
+
+    fun deleteRecursive(fileOrDirectory: File) {
+        try {
+            if (fileOrDirectory.isDirectory) for (child in fileOrDirectory.listFiles()) deleteRecursive(
+                child
+            )
+            fileOrDirectory.delete()
+        }catch (e:Exception){
+            e.printStackTrace()
         }
     }
 }

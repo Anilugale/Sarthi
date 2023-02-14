@@ -1,18 +1,19 @@
 package com.vk.sarthi.ui.screen
 
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -28,22 +30,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.vk.sarthi.R
 import com.vk.sarthi.cache.Cache
 import com.vk.sarthi.model.DailyVisitModel
+import com.vk.sarthi.model.PersonsVisited
 import com.vk.sarthi.ui.nav.BottomNavigationBar
 import com.vk.sarthi.ui.nav.Screens
 import com.vk.sarthi.ui.theme.FontColor2
 import com.vk.sarthi.ui.theme.WindowColor
-import com.vk.sarthi.viewmodel.DailyVisitStateList
-import com.vk.sarthi.viewmodel.DailyVisitVM
-import com.vk.sarthi.viewmodel.MainViewModel
-import com.vk.sarthi.viewmodel.VisitOffLineModel
+import com.vk.sarthi.viewmodel.*
 import kotlinx.coroutines.launch
 
 
@@ -161,10 +164,11 @@ fun DailyVisit(navigatorController: NavHostController?) {
                     if (targetState.list.isEmpty()) {
                         ShowEmptyListDailyVisit()
                     } else {
+                        val reversed = targetState.list.reversed()
                         LazyColumn(contentPadding = PaddingValues(5.dp), state = lazyState) {
-                            items(count = targetState.list.size, key = { it }) {
+                            items(count = reversed.size, key = { it }) {
                                 ShowDailyItemOffline(
-                                    targetState.list[it],
+                                    reversed[it],
                                 )
                             }
                         }
@@ -326,15 +330,22 @@ fun ShowDailyItem(
 }
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ShowDailyItemOffline(
     dailyVisitModel: VisitOffLineModel,
 ) {
+    val isShowDetails = remember {
+        mutableStateOf(false)
+    }
 
     Card(
         modifier = Modifier
             .padding(10.dp)
             .fillMaxWidth()
+            .clickable {
+                isShowDetails.value = true
+            }
     ) {
 
         Column(
@@ -349,19 +360,124 @@ fun ShowDailyItemOffline(
                     fontSize = 16.sp
                 )
             }
+        }
 
-            Spacer(modifier = Modifier.height(5.dp))
 
-            Text(
-                text = "Offline Data", fontSize = 12.sp,
-                color = Color.White,
-                modifier = Modifier.background(Color.Gray, shape = RoundedCornerShape(10.dp)).padding(5.dp)
-            )
+    }
+    if (isShowDetails.value) {
+        ShowOfflineDetails(dailyVisitModel) {
+            isShowDetails.value = !isShowDetails.value
+        }
+    }
+}
+@Composable
+fun ShowOfflineDetails(model: VisitOffLineModel, function: () -> Unit) {
+
+    Dialog(
+        onDismissRequest = {
+            function()
+        },
+    ) {
+        Card(backgroundColor = MaterialTheme.colors.surface) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(15.dp)
+                    .verticalScroll(state = rememberScrollState())
+            ) {
+                model.hashMap.forEach { it ->
+                    if (it.value.isNotEmpty()) {
+                        if(it.key == "persons_visited"){
+                            if(it.value == "[]"){
+                                return@forEach
+                            }
+                            val list = Gson().fromJson<ArrayList<PersonsVisited>>(it.value,object :TypeToken<ArrayList<PersonsVisited>>(){}.type )
+                            Text(text = stringResource(R.string.person_visited), fontSize = 13.sp)
+                            list.forEach {
+                                Text(text = "नाव - "+it.name)
+                                Text(text = "विषय - "+it.subject)
+                                Text(text = "माहिती - "+it.information)
+                                Text(text = "सर्वेक्षण - "+it.servey)
+                                Spacer(modifier = Modifier.height(3.dp))
+                            }
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }else{
+                            if(it.key != "coordinator_id" &&
+                                it.key != "villageid" &&
+                                it.key != "visitid" &&
+                                it.key != "latitude" &&
+                                it.key != "longitude"
+                            ) {
+                                Text(text = getLabel(it.key, LocalContext.current), fontSize = 13.sp)
+                                Text(text = it.value)
+                                Spacer(modifier = Modifier.height(10.dp))
+                            }
+                        }
+                    }
+                }
+
+                OutlinedButton(onClick = { function() }, modifier = Modifier.align(Alignment.End)) {
+                    Text(text = "Okay")
+                }
+
+            }
         }
     }
 
-
 }
+
+fun getLabel(key: String, current: Context): String {
+    return when (key) {
+        "birthdayinfo" -> {
+            current.getString(R.string.birthday_info)
+        }
+        "rashanshopinfo" -> {
+            current.getString(R.string.ration_info)
+        }
+        "electricityinfo" -> {
+            current.getString(R.string.electric_info)
+        }
+        "drinkingwaterinfo" -> {
+            current.getString(R.string.drinking_water_info)
+        }
+        "watercanelinfo" -> {
+            current.getString(R.string.water_canal_info)
+        }
+        "schoolinfo" -> {
+            current.getString(R.string.school_info)
+        }
+        "primarycarecenterinfo" -> {
+            current.getString(R.string.prathamik_info)
+        }
+        "veterinarymedicineinfo" -> {
+            current.getString(R.string.pashu_info)
+        }
+        "govservantinfo" -> {
+            current.getString(R.string.gov_emp_info)
+        }
+        "politicalinfo" -> {
+            current.getString(R.string.politics_info)
+        }
+        "deathpersoninfo" -> {
+            current.getString(R.string.death_person_info)
+        }
+        "newschemes" -> {
+            current.getString(R.string.yojna_list)
+        }
+        "devinfo" -> {
+            current.getString(R.string.development_info)
+        }
+        "otherinfo" -> {
+            current.getString(R.string.other_info)
+        }
+        else -> {
+            key
+        }
+    }
+}
+
+
+
 
 
 

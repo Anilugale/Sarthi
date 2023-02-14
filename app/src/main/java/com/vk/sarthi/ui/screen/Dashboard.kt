@@ -38,10 +38,12 @@ import com.vk.sarthi.ui.theme.FontColor2
 import com.vk.sarthi.ui.theme.Teal200
 import com.vk.sarthi.ui.theme.WindowColor
 import com.vk.sarthi.utli.SettingPreferences
+import com.vk.sarthi.utli.Util
 import com.vk.sarthi.viewmodel.MainViewModel
 import com.vk.sarthi.viewmodel.SyncState
 import com.vk.sarthi.viewmodel.VillageState
 import kotlinx.coroutines.launch
+import java.io.File
 
 
 @Composable
@@ -57,7 +59,9 @@ fun Dashboard(
     val modeVM = remember {
         activityViewModel
     }
-    if((Cache.isOfflineOfficeWork(context) || Cache.isOfflineDailyVisit(context)) && WifiService.instance.isOnline() ) {
+    val offlineDailyVisit = Cache.isOfflineDailyVisit(context)
+    val offlineDailyVisit1 = Cache.isOfflineOfficeWork(context)
+    if((offlineDailyVisit ||  offlineDailyVisit1 ) && WifiService.instance.isOnline() ) {
         LaunchedEffect(true ){
             activityViewModel.sendOffLineData()
         }

@@ -351,9 +351,9 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
             }
 
-          val personDataValue = arrayListOf<Array<MutableState<String>>>()
+            val personDataValue = arrayListOf<Array<MutableState<String>>>()
 
-            personVisitedList.forEachIndexed { _, model->
+            personVisitedList.forEachIndexed { _, model ->
 
                 val name = remember {
                     model.name
@@ -368,9 +368,18 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                 val information = remember {
                     model.information
                 }
-                val data = arrayOf(name,subject,survey,information)
+                val data = arrayOf(name, subject, survey, information)
                 personDataValue.add(data)
-                PersonVisitedUI(model = model, labelColor, personVisitedList, (dailyModel == null),name,subject,survey,information)
+                PersonVisitedUI(
+                    model = model,
+                    labelColor,
+                    personVisitedList,
+                    (dailyModel == null),
+                    name,
+                    subject,
+                    survey,
+                    information
+                )
             }
 
 
@@ -871,10 +880,10 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     }
 
                     val map: HashMap<String, String> = HashMap()
-
+                    map["persons_visited"] = Gson().toJson(personalList)
                     map["coordinator_id"] = Cache.loginUser!!.id.toString()
                     map["villageid"] = villageName!!.id.toString()
-                    map["persons_visited"] = Gson().toJson(personalList)
+
                     if (dailyModel != null) {
                         map["visitid"] =
                             dailyModel.id.toString()
