@@ -435,7 +435,7 @@ fun WorkDailyUI(
                 modalBottomSheetState?.hide()
             }
         }) {
-        if(Util.isTodayDateForOffice(model.createddate)) {
+     //   if(Util.isTodayDateForOffice(model.createddate)) {
             Icon(
                 Icons.Outlined.MoreVert,
                 contentDescription = "",
@@ -460,7 +460,7 @@ fun WorkDailyUI(
                         }
                     }
             )
-        }
+    //    }
         Column(
             modifier = Modifier
                 .fillMaxWidth()

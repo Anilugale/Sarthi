@@ -68,7 +68,7 @@ fun DailyVisitDetailsUI(workID: String, navigatorController: NavHostController?)
             },
             actions = {
                 dailyModel?.let {
-                    if(Util.isTodayDate(it.createddate)) {
+                    //if(Util.isTodayDate(it.createddate)) {
                         Icon(
                             imageVector = Icons.Outlined.Edit,
                             contentDescription = "Edit",
@@ -88,7 +88,7 @@ fun DailyVisitDetailsUI(workID: String, navigatorController: NavHostController?)
                                     showDialog.value = true
                                 }
                         )
-                    }
+                   // }
                 }
 
             }
