@@ -73,6 +73,7 @@ class AddDailyVisitViewModel @Inject constructor(private val service: Service,va
             }
         }else{
            Cache.addOfficeWorkOffline(pref,OfficeWorkOfflineModel(
+               id = System.currentTimeMillis().toString(),
                commentTxt = commentTxt,
                coordinatorid = Cache.loginUser!!.id.toString(),
                usermobileno = Cache.loginUser!!.mobileno,
@@ -87,8 +88,9 @@ class AddDailyVisitViewModel @Inject constructor(private val service: Service,va
 
 
 data class  OfficeWorkOfflineModel(
-    val  commentTxt:String,
+    var id:String?,
+    var commentTxt:String,
     val  coordinatorid:String,
     val  usermobileno:String,
-    val  filePath:String,
+    var filePath:String,
 )

@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
@@ -16,6 +17,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -30,7 +32,6 @@ import com.vk.sarthi.ui.nav.ShowNavGraph
 import com.vk.sarthi.ui.theme.SarthiTheme
 import com.vk.sarthi.utli.Constants
 import com.vk.sarthi.utli.SettingPreferences
-import com.vk.sarthi.utli.toast
 import dagger.hilt.android.AndroidEntryPoint
 import java.lang.ref.WeakReference
 
@@ -133,7 +134,6 @@ class MainActivity : ComponentActivity() {
                     }
             } else {
                 showPermissionDialog()
-
             }
         }
 

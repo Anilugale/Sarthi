@@ -90,8 +90,37 @@ object Cache {
          if (stringData != null) {
              officeWorkOfflineList = gson.fromJson(stringData, object :TypeToken<ArrayList<OfficeWorkOfflineModel>>(){}.type )
          }
+
+        if (officeWorkOfflineList.isNotEmpty() && officeWorkOfflineList[0] == null) {
+            clearOfflineOfficeWork(current)
+            with(officeWorkOfflineList) {
+                forEachIndexed { index, it ->
+                    if (it.id == null) {
+                        it.id = System.currentTimeMillis().toString() + index
+                    }
+                    addOfficeWorkOffline(pref, it)
+                }
+            }
+        }
          return officeWorkOfflineList.isNotEmpty()
      }
+
+
+    fun updatedOffLineModel(dataModel: OfficeWorkOfflineModel, context: Context) {
+        val pref = SettingPreferences.get(context)
+        clearOfflineOfficeWork(context)
+        with(officeWorkOfflineList) {
+            forEach {
+                if (it.id == dataModel.id) {
+                    it.commentTxt = dataModel.commentTxt
+                    it.filePath = dataModel.filePath
+                    addOfficeWorkOffline(pref, dataModel)
+                }else {
+                    addOfficeWorkOffline(pref, it)
+                }
+            }
+        }
+    }
 
     fun clearOfflineOfficeWork(current: Context) {
         val pref = SettingPreferences.get(current)
@@ -139,6 +168,7 @@ object Cache {
         dailyVisitOfflineList.remove(removeItems)
         pref.edit().putString(DAILY_OFFLINE_LIST,gson.toJson(dailyVisitOfflineList)).apply()
     }
+
 
 
 }

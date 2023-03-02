@@ -23,13 +23,12 @@
  *
  * Source: https://github.com/ImaginativeShohag/Why-Not-Compose
  */
-package com.vk.sarthi.utli
+package com.vk.sarthi
 
 import android.content.Context
 import android.net.Uri
 import android.widget.Toast
 import androidx.core.content.FileProvider
-import com.vk.sarthi.BuildConfig
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat

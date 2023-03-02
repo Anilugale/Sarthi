@@ -37,6 +37,8 @@ import com.google.gson.Gson
 import com.vk.sarthi.BuildConfig
 import com.vk.sarthi.R
 import com.vk.sarthi.cache.Cache
+import com.vk.sarthi.createImageFile
+import com.vk.sarthi.getUriForFile
 import com.vk.sarthi.model.DailyVisitModel
 import com.vk.sarthi.model.PersonsVisited
 import com.vk.sarthi.model.Village

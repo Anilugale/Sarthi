@@ -39,6 +39,7 @@ sealed class Screens(val route: String, val icon: ImageVector?) {
     object AddComment : Screens("AddComment/", null)
     object DailyVisit : Screens("DailyVisit", Icons.Outlined.CalendarToday)
     object AddDailyVisit : Screens("AddDailyVisit", null)
+    object EditOffLineDailyWork : Screens("EditOffLineDailyWork", null)
     object OfficeWork : Screens("OfficeWork", Icons.Outlined.LeaveBagsAtHome)
     object AddDailyWork : Screens("AddDailyWork", null)
     object DailyVisitDetails : Screens("DailyVisitDetails", null)
@@ -150,6 +151,7 @@ fun ShowNavGraph(name: String) {
             AddComment(id = it.arguments?.getString("id")!!,commentid = it.arguments?.getString("commentId")!!,navigator) }
         composable(Screens.DailyVisit.route) { DailyVisit(navigator) }
         composable(Screens.AddDailyVisit.route+"/{id}") { AddDailyVisit(workID = it.arguments?.getString("id")!!,navigator) }
+        composable(Screens.EditOffLineDailyWork.route+"/{id}") { EditOffLineDailyWork(workID = it.arguments?.getString("id")!!,navigator) }
         composable(Screens.OfficeWork.route) { OfficeWork(navigator) }
 
         composable(Screens.AddDailyWork.route+"/{id}") { AddDailyWork(workID = it.arguments?.getString("id")!!,navigator) }

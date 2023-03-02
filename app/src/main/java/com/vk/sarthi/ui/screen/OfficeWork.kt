@@ -44,7 +44,6 @@ import com.vk.sarthi.model.OfficeWorkModel
 import com.vk.sarthi.ui.nav.BottomNavigationBar
 import com.vk.sarthi.ui.nav.Screens
 import com.vk.sarthi.ui.theme.*
-import com.vk.sarthi.utli.Util
 import com.vk.sarthi.viewmodel.OfficeWorkOfflineModel
 import com.vk.sarthi.viewmodel.OfficeWorkViewModel
 import com.vk.sarthi.viewmodel.Status
@@ -211,8 +210,8 @@ fun ShowOfficeListUI(
             }else{
                 LazyColumn(state = listState) {
                     items(count = targetState.list.size, key = {it}) {
-                        ShowOfflineOffList(targetState.list[it])
-                        
+                        ShowOfflineOffList(targetState.list[it],navigatorController)
+
                     }
                 }
             }
@@ -236,10 +235,17 @@ fun ShowOfficeListUI(
 }
 
 @Composable
-fun ShowOfflineOffList(officeWorkOfflineModel: OfficeWorkOfflineModel) {
+fun ShowOfflineOffList(
+    officeWorkOfflineModel: OfficeWorkOfflineModel,
+    navigatorController: NavHostController?
+) {
+
     Card(modifier = Modifier
         .padding(10.dp)
         .fillMaxWidth()
+        .clickable {
+            navigatorController?.navigate(Screens.EditOffLineDailyWork.route + "/${officeWorkOfflineModel.id}")
+        }
 
     ) {
         Column (modifier = Modifier.padding(10.dp)){
@@ -394,7 +400,7 @@ fun ShowListOffice(
                     StickHeader(section.toString())
                 }
                 items(sectionModel) { model ->
-                    WorkDailyUI(model, clickID, modalBottomSheetState, coroutineScope)
+                    WorkDailyUI(model, { clickID.value = it }, modalBottomSheetState, coroutineScope)
                 }
             }
             if(model.isFooter.value){
@@ -416,7 +422,7 @@ fun ShowListOffice(
 @Composable
 fun WorkDailyUI(
     model: OfficeWorkModel,
-    clickID: MutableState<String>,
+    clickID: (it:String) -> Unit,
     modalBottomSheetState: ModalBottomSheetState?,
     coroutineScope: CoroutineScope
 ) {
@@ -447,7 +453,7 @@ fun WorkDailyUI(
                     .fillMaxWidth(0.2f)
                     .align(Alignment.TopEnd)
                     .clickable {
-                        clickID.value = model.id.toString()
+                        clickID(model.id.toString())
                         coroutineScope.launch {
                             if (modalBottomSheetState != null) {
                                 if (modalBottomSheetState.isVisible) {
@@ -562,15 +568,15 @@ fun StickHeader(section: String) {
 fun OfficeWorkPreview() {
     WorkDailyUI(
         model = OfficeWorkModel(
-            attachments = "atachement",
-            comment = "sdfsd sdfsdf sdfsdf sdf sdf hi this is the way u sing a song sdf",
+            attachments = "AttachmentList",
+            comment = "e way u sing a song sdf",
             id = 1,
             createddate = "12/12/2022 12:20:10",
             updated_at = "12/12/2022 12:20:10",
             coordinator_id = 1,
             mobileno = "121223213123"
         ),
-        clickID = mutableStateOf("0"),
+        clickID = {  },
         modalBottomSheetState = null,
         coroutineScope = rememberCoroutineScope()
     )
@@ -578,6 +584,6 @@ fun OfficeWorkPreview() {
 
 @Composable
 @Preview
-fun stickHeaderPreview() {
+fun StickHeaderPreview() {
     StickHeader("2022-02-12")
 }
