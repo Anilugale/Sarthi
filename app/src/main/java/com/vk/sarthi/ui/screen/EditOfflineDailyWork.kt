@@ -37,14 +37,8 @@ import java.io.FileInputStream
 @Composable
 fun EditOffLineDailyWork(workID: String, navigatorController: NavHostController?) {
 
-    var fileUrl = remember {
+    val fileUrl = remember {
         mutableStateOf<File?>(null)
-    }
-    val fileName = remember {
-        mutableStateOf("")
-    }
-    val fileSize = remember {
-        mutableStateOf<Long>(0)
     }
     val context = LocalContext.current
 
@@ -58,14 +52,12 @@ fun EditOffLineDailyWork(workID: String, navigatorController: NavHostController?
             }
             if (cursor != null) {
                 cursor.moveToFirst()
-                fileName.value =
-                    cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
-                fileSize.value = cursor.getLong(cursor.getColumnIndex(OpenableColumns.SIZE))
+                val fileName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                val fileSize = cursor.getLong(cursor.getColumnIndex(OpenableColumns.SIZE))
                 cursor.close()
-                if (Util.checkForFileSize(fileSize.value)) {
-                    val fileInputStream =
-                        context.contentResolver.openInputStream(imageUri) as FileInputStream?
-                    val dst = File(context.cacheDir, fileName.value)
+                if (Util.checkForFileSize(fileSize)) {
+                    val fileInputStream = context.contentResolver.openInputStream(imageUri) as FileInputStream?
+                    val dst = File(context.cacheDir, fileName)
                     Util.copyFile(fileInputStream!!, dst)
                     fileUrl.value = dst
                 } else {
@@ -109,8 +101,8 @@ fun EditOffLineDailyWork(workID: String, navigatorController: NavHostController?
                 dataModel = Cache.officeWorkOfflineList.single { it.id == workID }
                 dataModel?.let {
                     if (it.filePath.isNotEmpty()) {
-                        fileUrl.value = File(it.filePath)
-                        fileName.value = fileUrl.value?.name ?: ""
+                    //    fileUrl.value = File(it.filePath)
+                     //   fileName.value = File(it.filePath).name ?: ""
                     }
                 }
             } catch (e: Exception) {
@@ -195,24 +187,24 @@ fun EditOffLineDailyWork(workID: String, navigatorController: NavHostController?
                 ) {
                     OutlinedButton(
                         onClick = {
-                            if (fileUrl.value == null) {
-                                pickPictureLauncher.launch("*/*")
-                            }
+                            pickPictureLauncher.launch("*/*")
                         },
                         modifier = Modifier
                             .padding(10.dp)
                             .align(Alignment.CenterVertically)
                     ) {
                         Text(
-                            text = if (fileUrl.value != null) {
-                                fileName.value
-                            } else {
+                            text =  if(fileUrl.value!=null){
+                                fileUrl.value?.name?:"Attachment"
+                            }else if(dataModel!=null && dataModel.filePath.isNotEmpty()){
+                               File( dataModel.filePath).name
+                            }else{
                                 "Attachment"
                             }
                         )
                     }
 
-                    if (fileUrl.value != null) {
+                    if (fileUrl.value!=null) {
                         Icon(
                             imageVector = Icons.Outlined.HighlightOff,
                             contentDescription = "remove",
@@ -221,8 +213,6 @@ fun EditOffLineDailyWork(workID: String, navigatorController: NavHostController?
                                 .align(Alignment.CenterVertically)
                                 .clickable {
                                     fileUrl.value = null
-                                    fileName.value = ""
-                                    fileSize.value = 0
                                 }
                         )
                     }

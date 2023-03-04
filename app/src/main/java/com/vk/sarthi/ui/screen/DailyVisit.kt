@@ -166,9 +166,10 @@ fun DailyVisit(navigatorController: NavHostController?) {
                     } else {
                         val reversed = targetState.list.reversed()
                         LazyColumn(contentPadding = PaddingValues(5.dp), state = lazyState) {
-                            items(count = reversed.size, key = { it }) {
+                            items(count = reversed.size,key = { it }) {
                                 ShowDailyItemOffline(
                                     reversed[it],
+                                    navigatorController
                                 )
                             }
                         }
@@ -330,10 +331,10 @@ fun ShowDailyItem(
 }
 
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ShowDailyItemOffline(
     dailyVisitModel: VisitOffLineModel,
+    navigatorController: NavHostController?,
 ) {
     val isShowDetails = remember {
         mutableStateOf(false)
@@ -344,7 +345,8 @@ fun ShowDailyItemOffline(
             .padding(10.dp)
             .fillMaxWidth()
             .clickable {
-                isShowDetails.value = true
+               // isShowDetails.value = true
+                navigatorController?.navigate(Screens.EditDailyVisit.route + "/${dailyVisitModel.id}")
             }
     ) {
 

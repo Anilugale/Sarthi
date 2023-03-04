@@ -1,7 +1,5 @@
 package com.vk.sarthi.ui.screen
 
-import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -9,46 +7,61 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.outlined.Attachment
-import androidx.compose.material.icons.outlined.RemoveCircle
-import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.gson.Gson
-import com.vk.sarthi.BuildConfig
+import com.google.gson.reflect.TypeToken
 import com.vk.sarthi.R
 import com.vk.sarthi.cache.Cache
 import com.vk.sarthi.createImageFile
 import com.vk.sarthi.getUriForFile
-import com.vk.sarthi.model.DailyVisitModel
 import com.vk.sarthi.model.PersonsVisited
 import com.vk.sarthi.model.Village
 import com.vk.sarthi.ui.theme.FontColor1
 import com.vk.sarthi.ui.theme.FontColor1Dark
-import com.vk.sarthi.ui.theme.FontColor2
-import com.vk.sarthi.utli.*
+import com.vk.sarthi.utli.Constants
+import com.vk.sarthi.utli.SettingPreferences
+import com.vk.sarthi.utli.SquireCropImage
 import com.vk.sarthi.viewmodel.AddDailyVisitVM
 import com.vk.sarthi.viewmodel.DailyVisitState
 import com.vk.sarthi.viewmodel.PersonVisitedModel
+import com.vk.sarthi.viewmodel.VisitOffLineModel
 import id.zelory.compressor.Compressor
 import id.zelory.compressor.constraint.quality
 import kotlinx.coroutines.launch
@@ -56,10 +69,10 @@ import java.io.File
 
 
 @Composable
-fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
-    var dailyModel: DailyVisitModel? = null
+fun EditDailyVisit(workID: String, navigatorController: NavHostController?) {
+    var dailyModel: VisitOffLineModel? = null
     if (workID != "0") {
-        dailyModel = Cache.getDailyVisitModel(workID.toInt())
+        dailyModel = Cache.dailyVisitOfflineList.single { it.id == workID }
     }
 
     val viewModel: AddDailyVisitVM = hiltViewModel()
@@ -75,7 +88,9 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
     val current = LocalContext.current
     val rememberCoroutineScope = rememberCoroutineScope()
-
+    if (Cache.villageData == null) {
+        Cache.restoreVillageData(current)
+    }
     when (collectAsState.value) {
 
         is DailyVisitState.Success -> {
@@ -123,10 +138,14 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
         })
     }) {
         val personVisitedList = remember { mutableStateListOf(PersonVisitedModel("1")) }
-        if (dailyModel != null) {
-            if (dailyModel.persons_visited.isNotEmpty()) {
+        if (dailyModel != null &&  dailyModel.hashMap.containsKey("persons_visited")) {
+            val strPersonData = dailyModel.hashMap["persons_visited"]
+            val list = Gson().fromJson<ArrayList<PersonsVisited>>(strPersonData,
+                object : TypeToken<ArrayList<PersonsVisited>>() {}.type)
+            if (list.isNotEmpty()) {
                 personVisitedList.clear()
-                dailyModel.persons_visited.forEachIndexed { index, user ->
+
+                list.forEachIndexed { index, user ->
                     val personVisitedModel = PersonVisitedModel(index.inc().toString())
                     personVisitedModel.name.value = user.name
                     personVisitedModel.subject.value = user.subject
@@ -135,25 +154,112 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     personVisitedList.add(personVisitedModel)
                 }
             }
+
         }
 
         var currentFile by remember { mutableStateOf<Uri?>(null) }
         var selectionFileType by remember { mutableStateOf("") }
 
-        var devFile by remember { mutableStateOf<File?>(null) }
-        var rationInfoFile by remember { mutableStateOf<File?>(null) }
-        var electricInfoFile by remember { mutableStateOf<File?>(null) }
-        var drinkingInfoFile by remember { mutableStateOf<File?>(null) }
-        var waterCanalInfoFile by remember { mutableStateOf<File?>(null) }
-        var schoolInfoFile by remember { mutableStateOf<File?>(null) }
-        var primaryHealthInfoFile by remember { mutableStateOf<File?>(null) }
-        var vetarnityHealthInfoFile by remember { mutableStateOf<File?>(null) }
-        var govInfoInfoFile by remember { mutableStateOf<File?>(null) }
-        var politicalInfoFile by remember { mutableStateOf<File?>(null) }
-        var deathPersonInfoFile by remember { mutableStateOf<File?>(null) }
-        var birthdayInfoFile by remember { mutableStateOf<File?>(null) }
-        var yojnaInfoFile by remember { mutableStateOf<File?>(null) }
-        var otherInfoFile by remember { mutableStateOf<File?>(null) }
+        var devFile by remember { mutableStateOf(
+            if (dailyModel!!.devinfofileBody.isEmpty()) {
+                null
+            }else{
+                File(dailyModel.devinfofileBody)
+            }
+        ) }
+        var rationInfoFile by remember { mutableStateOf(
+            if (dailyModel!!.rashanshopinfoBody.isEmpty()) {
+            null
+        }else{
+            File(dailyModel.rashanshopinfoBody)
+        }) }
+
+        var electricInfoFile by remember { mutableStateOf(
+            if (dailyModel!!.electricInfoFileBody.isEmpty()) {
+                null
+            }else{
+                File(dailyModel.electricInfoFileBody)
+            }
+        ) }
+
+        var drinkingInfoFile by remember { mutableStateOf(
+            if (dailyModel!!.drinkingwaterinfofileBody.isEmpty()) {
+                null
+            }else{
+                File(dailyModel.drinkingwaterinfofileBody)
+            }
+        ) }
+        var waterCanalInfoFile by remember { mutableStateOf(
+            if (dailyModel!!.watercanelinfofileBody.isEmpty()) {
+                null
+            }else{
+                File(dailyModel.watercanelinfofileBody)
+            }
+        ) }
+        var schoolInfoFile by remember { mutableStateOf(
+            if (dailyModel!!.schoolinfofileBody.isEmpty()) {
+                null
+            }else{
+                File(dailyModel.schoolinfofileBody)
+            }
+        ) }
+        var primaryHealthInfoFile by remember { mutableStateOf(
+            if (dailyModel!!.primaryHealthInfoFileBody.isEmpty()) {
+                null
+            }else{
+                File(dailyModel.primaryHealthInfoFileBody)
+            }
+        ) }
+        var vetarnityHealthInfoFile by remember { mutableStateOf(
+            if (dailyModel!!.vetarnityHealthInfoFileBody.isEmpty()) {
+                null
+            }else{
+                File(dailyModel.vetarnityHealthInfoFileBody)
+            }
+        ) }
+        var govInfoInfoFile by remember { mutableStateOf(
+            if (dailyModel!!.govInfoInfoFileBody.isEmpty()) {
+                null
+            }else{
+                File(dailyModel.govInfoInfoFileBody)
+            }
+        ) }
+        var politicalInfoFile by remember { mutableStateOf(
+            if (dailyModel!!.politicalInfoFileBody.isEmpty()) {
+                null
+            }else{
+                File(dailyModel.politicalInfoFileBody)
+            }
+        ) }
+        var deathPersonInfoFile by remember { mutableStateOf(
+            if (dailyModel!!.deathPersonInfoFileBody.isEmpty()) {
+                null
+            }else{
+                File(dailyModel.deathPersonInfoFileBody)
+            }
+        ) }
+        var birthdayInfoFile by remember { mutableStateOf(
+            if (dailyModel!!.birthdayFileBody.isEmpty()) {
+                null
+            }else{
+                File(dailyModel.birthdayFileBody)
+            }
+        ) }
+        var yojnaInfoFile by remember { mutableStateOf(
+            if (dailyModel!!.newschemesfileBody.isEmpty()) {
+                null
+            }else{
+                File(dailyModel.newschemesfileBody)
+            }
+        ) }
+        var otherInfoFile by remember { mutableStateOf(
+
+            if (dailyModel!!.otherInfoFileBody.isEmpty()) {
+                null
+            }else{
+                File(dailyModel.otherInfoFileBody)
+            }
+        ) }
 
 
         val uCropLauncher = rememberLauncherForActivityResult(SquireCropImage()) { uri ->
@@ -250,35 +356,20 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
             }
         }
 
-        val developmentInfo =
-            remember { mutableStateOf(if (dailyModel?.devinfo != null) dailyModel.devinfo else "") }
-
-        val rationShopInfo =
-            remember { mutableStateOf(if (dailyModel?.rashanshopinfo != null) dailyModel.rashanshopinfo else "") }
-        val electricInfo =
-            remember { mutableStateOf(if (dailyModel?.electricityinfo != null) dailyModel.electricityinfo else "") }
-        val drinkingWaterInfo =
-            remember { mutableStateOf(if (dailyModel?.drinkingwaterinfo != null) dailyModel.drinkingwaterinfo else "") }
-        val deathPersonInfo =
-            remember { mutableStateOf(if (dailyModel?.deathpersoninfo != null) dailyModel.deathpersoninfo else "") }
-        val waterCanalInfo =
-            remember { mutableStateOf(if (dailyModel?.watercanelinfo != null) dailyModel.watercanelinfo else "") }
-        val schoolInfo =
-            remember { mutableStateOf(if (dailyModel?.schoolinfo != null) dailyModel.schoolinfo else "") }
-        val prathamikInfo =
-            remember { mutableStateOf(if (dailyModel?.primarycarecenterinfo != null) dailyModel.primarycarecenterinfo else "") }
-        val pashuInfo =
-            remember { mutableStateOf(if (dailyModel?.veterinarymedicineinfo != null) dailyModel.veterinarymedicineinfo else "") }
-        val govEmpInfo =
-            remember { mutableStateOf(if (dailyModel?.govservantinfo != null) dailyModel.govservantinfo else "") }
-        val politicsInfo =
-            remember { mutableStateOf(if (dailyModel?.politicalinfo != null) dailyModel.politicalinfo else "") }
-        val birthdayInfo =
-            remember { mutableStateOf(if (dailyModel?.birthdayinfo != null) dailyModel.birthdayinfo else "") }
-        val gatLabhYojna =
-            remember { mutableStateOf(if (dailyModel?.newschemes != null) dailyModel.newschemes else "") }
-        val otherInfo =
-            remember { mutableStateOf(if (dailyModel?.otherinfo != null) dailyModel.otherinfo else "") }
+        val developmentInfo = remember { mutableStateOf(if (dailyModel?.hashMap?.get("devinfo") != null) dailyModel.hashMap["devinfo"]!! else "") }
+        val rationShopInfo = remember { mutableStateOf(if (dailyModel?.hashMap?.get("rashanshopinfo") != null) dailyModel.hashMap["rashanshopinfo"]!! else "") }
+        val electricInfo = remember { mutableStateOf(if (dailyModel?.hashMap?.get("electricityinfo") != null) dailyModel.hashMap["electricityinfo"]!! else "") }
+        val drinkingWaterInfo = remember { mutableStateOf(if (dailyModel?.hashMap?.get("drinkingwaterinfo") != null) dailyModel.hashMap["drinkingwaterinfo"]!! else "") }
+        val deathPersonInfo = remember { mutableStateOf(if (dailyModel?.hashMap?.get("deathpersoninfo") != null) dailyModel.hashMap["deathpersoninfo"]!! else "") }
+        val waterCanalInfo = remember { mutableStateOf(if (dailyModel?.hashMap?.get("watercanelinfo") != null) dailyModel.hashMap["watercanelinfo"]!! else "") }
+        val schoolInfo = remember { mutableStateOf(if (dailyModel?.hashMap?.get("schoolinfo") != null) dailyModel.hashMap["schoolinfo"]!! else "") }
+        val prathamikInfo = remember { mutableStateOf(if (dailyModel?.hashMap?.get("primarycarecenterinfo") != null) dailyModel.hashMap["primarycarecenterinfo"]!! else "") }
+        val pashuInfo = remember { mutableStateOf(if (dailyModel?.hashMap?.get("veterinarymedicineinfo") != null) dailyModel.hashMap["veterinarymedicineinfo"]!! else "") }
+        val govEmpInfo = remember { mutableStateOf(if (dailyModel?.hashMap?.get("govservantinfo") != null) dailyModel.hashMap["govservantinfo"]!! else "") }
+        val politicsInfo = remember { mutableStateOf(if (dailyModel?.hashMap?.get("politicalinfo") != null) dailyModel.hashMap["politicalinfo"]!! else "") }
+        val birthdayInfo = remember { mutableStateOf(if (dailyModel?.hashMap?.get("birthdayinfo") != null) dailyModel.hashMap["birthdayinfo"]!! else "") }
+        val gatLabhYojna = remember { mutableStateOf(if (dailyModel?.hashMap?.get("newschemes") != null) dailyModel.hashMap["newschemes"]!! else "") }
+        val otherInfo = remember { mutableStateOf(if (dailyModel?.hashMap?.get("otherinfo") != null) dailyModel.hashMap["otherinfo"]!! else "") }
 
         val labelColor = if (isSystemInDarkTheme()) {
             FontColor1Dark
@@ -293,8 +384,9 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
         ) {
             var selectedVillage: Village? = null
             if (dailyModel != null && Cache.villageData != null) {
+                val villageID = dailyModel.hashMap["villageid"] ?:""
                 selectedVillage =
-                    Cache.villageData!!.villages.single {model-> dailyModel.villageid == model.id }
+                    Cache.villageData!!.villages.single {model-> villageID.toInt() == model.id }
             }
 
             var ganName by remember { mutableStateOf(selectedVillage?.gan ?: "") }
@@ -888,21 +980,20 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                     map["coordinator_id"] = Cache.loginUser!!.id.toString()
                     map["villageid"] = villageName!!.id.toString()
 
-                    if (dailyModel != null) {
-                        map["visitid"] =
-                            dailyModel.id.toString()
-                    }
-                if (rationShopInfo.value.isNotEmpty() && rationInfoFile == null && dailyModel == null) {
+
+                    Log.d("##", "eeeee: $devFile")
+                    Log.d("##", "eeeee: $rationInfoFile")
+                if (rationShopInfo.value.isNotEmpty() && rationInfoFile == null) {
                     current.toast(current.getString(R.string.ration_info)+" Photo Mandatory")
-                } else if (electricInfo.value.isNotEmpty() && electricInfoFile == null && dailyModel == null) {
+                } else if (electricInfo.value.isNotEmpty() && electricInfoFile == null ) {
                     current.toast(current.getString(R.string.electric_info)+" Photo Mandatory")
-                } else if (schoolInfo.value.isNotEmpty() && schoolInfoFile == null && dailyModel == null) {
+                } else if (schoolInfo.value.isNotEmpty() && schoolInfoFile == null ) {
                     current.toast(current.getString(R.string.school_info)+" Photo Mandatory")
-                } else if (prathamikInfo.value.isNotEmpty() && primaryHealthInfoFile == null && dailyModel == null) {
+                } else if (prathamikInfo.value.isNotEmpty() && primaryHealthInfoFile == null ) {
                     current.toast(current.getString(R.string.prathamik_info)+" Photo Mandatory")
-                } else if (developmentInfo.value.isNotEmpty() && devFile == null && dailyModel == null) {
+                } else if (developmentInfo.value.isNotEmpty() && devFile == null) {
                     current.toast(current.getString(R.string.development_info)+" Photo Mandatory")
-                }   else if (pashuInfo.value.isNotEmpty() && vetarnityHealthInfoFile == null && dailyModel == null) {
+                }   else if (pashuInfo.value.isNotEmpty() && vetarnityHealthInfoFile == null ) {
                         current.toast(current.getString(R.string.pashu_info)+" Photo Mandatory")
                 } else {
 
@@ -940,9 +1031,10 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
                         map["newschemes"] = gatLabhYojna.value
                         map["devinfo"] = developmentInfo.value
                         map["otherinfo"] = otherInfo.value
+                        Cache.removeOfflineDaily(current,dailyModel!!)
 
                         viewModel.setDailyVisitReq(
-                            dailyModel?.id ?: 0, map,
+                             0, map,
                             birthdayInfoFile,
                             rationInfoFile,
                             electricInfoFile,
@@ -981,101 +1073,5 @@ fun AddDailyVisit(workID: String, navigatorController: NavHostController?) {
 
 
 
-fun showImage(devFile: File, current: Context) {
-    val uriForFile =
-        FileProvider.getUriForFile(current, BuildConfig.APPLICATION_ID + ".fileprovider", devFile)
-
-    val intent = Intent(Intent.ACTION_VIEW)
-        .setDataAndType(uriForFile,
-            "image/*"
-        ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    current.startActivity(intent)
-}
 
 
-fun resetErrorFlag(it: PersonVisitedModel) {
-    it.isN.value = false
-    it.isS.value = false
-    it.isSu.value = false
-    it.isIn.value = false
-}
-
-@Composable
-fun PersonVisitedUI(
-    model: PersonVisitedModel,
-    labelColor: Color,
-    personVisitedList: SnapshotStateList<PersonVisitedModel>,
-    isAddNew: Boolean,
-    name: MutableState<String>,
-    subject: MutableState<String>,
-    survey: MutableState<String>,
-    information: MutableState<String>
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 20.dp, end = 10.dp)
-    ) {
-        if (isAddNew) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Person ${model.id}")
-                if (model.id != "1") {
-                    Icon(Icons.Outlined.RemoveCircle,
-                        contentDescription = "",
-                        tint = labelColor,
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .clickable {
-                                personVisitedList.remove(model)
-                            }
-
-                    )
-                }
-            }
-        }
-
-
-
-
-
-        OutlinedTextField(
-            value = name.value,
-            onValueChange = { name.value = it },
-            label = { Text(text = stringResource(R.string.name)) },
-            modifier = Modifier.fillMaxWidth(),
-            isError = model.isN.value,
-
-            )
-        OutlinedTextField(
-            value = subject.value,
-            onValueChange = { subject.value = it },
-            label = { Text(text = stringResource(R.string.subject)) },
-            modifier = Modifier.fillMaxWidth(),
-            isError = model.isS.value
-        )
-        OutlinedTextField(
-            value = information.value,
-            onValueChange = { information.value = it },
-            label = { Text(text = stringResource(R.string.info)) },
-            modifier = Modifier.fillMaxWidth(),
-            isError = model.isIn.value
-        )
-        OutlinedTextField(
-            value = survey.value,
-            onValueChange = { survey.value = it },
-            label = { Text(text = stringResource(R.string.survey)) },
-            modifier = Modifier.fillMaxWidth(),
-            isError = model.isSu.value
-        )
-        Divider(color = FontColor2, modifier = Modifier.padding(vertical = 10.dp))
-    }
-}
-
-
-
-
-@Composable
-@Preview
-fun AddDailyPreview() {
-    AddDailyVisit("0", null)
-}

@@ -91,7 +91,7 @@ object Cache {
              officeWorkOfflineList = gson.fromJson(stringData, object :TypeToken<ArrayList<OfficeWorkOfflineModel>>(){}.type )
          }
 
-        if (officeWorkOfflineList.isNotEmpty() && officeWorkOfflineList[0] == null) {
+        if (officeWorkOfflineList.isNotEmpty() && officeWorkOfflineList[0].id == null) {
             clearOfflineOfficeWork(current)
             with(officeWorkOfflineList) {
                 forEachIndexed { index, it ->
@@ -140,6 +140,20 @@ object Cache {
             list = gson.fromJson(stringData, object :TypeToken<ArrayList<VisitOffLineModel>>(){}.type )
         }
         list.add(model)
+        pref.edit().putString(DAILY_OFFLINE_LIST,gson.toJson(list)).apply()
+    }
+
+    fun removeOfflineDaily(
+            context:Context,
+        model: VisitOffLineModel
+    ) {
+        val pref = SettingPreferences.get(context)
+        val stringData = pref.getString(DAILY_OFFLINE_LIST, null)
+        var list = ArrayList<VisitOffLineModel>()
+        if (stringData != null) {
+            list = gson.fromJson(stringData, object :TypeToken<ArrayList<VisitOffLineModel>>(){}.type )
+        }
+        list.removeIf { it.id == model.id }
         pref.edit().putString(DAILY_OFFLINE_LIST,gson.toJson(list)).apply()
     }
 

@@ -257,6 +257,7 @@ class AddDailyVisitVM @Inject constructor(val service: Service, private val pref
             Cache.addDailyVisitOffline(
                 pref = pref,
                 model = VisitOffLineModel(
+                    id = System.currentTimeMillis().toString(),
                     model,
                     birthdayFileBody = if (birthdayInfoFile!=null) { birthdayInfoFile.path}else{""},
                     rashanshopinfoBody = if (rationInfoFile!=null) { rationInfoFile.path}else{""},
@@ -283,6 +284,7 @@ class AddDailyVisitVM @Inject constructor(val service: Service, private val pref
 
 }
 data class VisitOffLineModel(
+    var id :String,
     val hashMap: HashMap<String, String>,
     val birthdayFileBody: String,
     val  rashanshopinfoBody: String,
